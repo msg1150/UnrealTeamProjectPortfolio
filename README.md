@@ -6,8 +6,8 @@ Unreal Engine 팀 프로젝트에서 직접 작업한 주요 시스템의 소스
 원본 팀 프로젝트에서는 Unreal 모듈 규칙과 협업을 위해 Public/Private 및 기능별 폴더로
 분리되어 있었지만, 여기서는 코드를 빠르게 확인할 수 있도록 시스템 단위로 단순화했습니다.
 
-본 저장소는 코드 열람을 위한 포트폴리오 저장소이며, 원본 프로젝트의 디렉터리 구조를 단순화했기 때문에 
-독립 빌드를 목적으로 하지 않습니다.
+본 저장소는 코드 열람을 위한 포트폴리오 저장소이며,
+원본 프로젝트의 디렉터리 구조를 단순화했기 때문에 독립 빌드를 목적으로 하지 않습니다.
 
 ## PathLink
 
@@ -31,7 +31,7 @@ AI가 Teleport / JumpPad / Jump / Drop을 포함한 특수 이동 경로를 탐�
 
 ## JsonAssetSync
 
-외부 JSON 데이터를 Unreal Editor와 Runtime에서 DataAsset, DataTable, CurveTable, FloatCurve에 적용하기 위한 시스템입니다.
+외부 JSON 데이터를 Unreal Editor와 Runtime에서 적용하기 위한 시스템입니다.
 
 - `JsonApplyService.cpp / .h` : 외부 데이터 적용 처리
 - `JsonAssetSyncSubsystem.cpp / .h` : 적용 진입점과 상태 관리
@@ -42,7 +42,8 @@ AI가 Teleport / JumpPad / Jump / Drop을 포함한 특수 이동 경로를 탐�
 
 ## GameplayValidator
 
-Portal / JumpPad / PathLink의 잘못된 레벨 배치를 플레이 테스트 전에 검사하는 Editor Validation Tool입니다.
+Portal / JumpPad / PathLink의 잘못된 레벨 배치를
+플레이 테스트 전에 검사하는 Editor Validation Tool입니다.
 
 - `PortalValidationProvider.*`
 - `JumpPadValidationProvider.*`
@@ -56,11 +57,13 @@ Portal / JumpPad / PathLink의 잘못된 레벨 배치를 플레이 테스트 �
 
 ## DataEditor
 
-DataTable / CurveTable의 CSV Import·Export를 지원합니다.
+Unreal Editor를 실행하지 않고 외부 데이터를 조회·수정하기 위한 데스크톱 편집 도구입니다.
 
 - `MainWindow.xaml / .cs`
 - `Core/`
 - `Editors/`
 - `JsonAssetDataEditor.csproj`
+
+DataEditor는 파일 수가 많아 `Core`, `Editors` 두 폴더만 한 단계 유지했습니다.
 
 [코드 보기](./DataEditor)
