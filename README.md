@@ -64,6 +64,4 @@ Unreal Editor를 실행하지 않고 외부 데이터를 조회·수정하기 �
 - `Editors/`
 - `JsonAssetDataEditor.csproj`
 
-DataEditor는 파일 수가 많아 `Core`, `Editors` 두 폴더만 한 단계 유지했습니다.
-
 [코드 보기](./DataEditor)
