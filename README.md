@@ -44,7 +44,7 @@ Portal / JumpPad / PathLink의 잘못된 레벨 배치를 플레이 테스트 �
 - `PortalValidationProvider.*`
 - `JumpPadValidationProvider.*`
 - `PathLinkValidationProvider.*`
-- `GameplayValidationRegistry.*`
+- `GameplayValidationProviderRegistry.*`
 - `GameplayValidationWorldScanner.*`
 
 원본 프로젝트에서는 Unreal Editor Plugin 형태로 구성되어 있었습니다.
