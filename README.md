@@ -29,6 +29,17 @@ AI가 Teleport / JumpPad / Jump / Drop을 포함한 특수 이동 경로를 탐�
 
 [코드 보기](./DeathCam)
 
+## Character Appearance
+
+캐릭터 DataTable과 모델링 DataTable을 분리해, 캐릭터별 일반 메시와 사망 외형을 선택하는 시스템입니다.
+
+- `CharacterAppearanceComponent.cpp / .h` : Character Row → Modeling ID → Modeling Row 조회, 메시 적용 및 복제 처리
+- 일반 캐릭터 메시와 사망 외형을 스폰 시점에 동기화
+- 다중 사망 파츠 구조는 기존 Ragdoll / Impulse 연출을 유지하며, 캐릭터별 전용 파츠가 등록되면 해당 파츠만 교체
+- Doomsday처럼 전신 메시의 머티리얼 슬롯 구성이 다른 스킨은 파츠 역할(몸통·팔·다리·눈)에 맞춰 대응 머티리얼을 적용
+
+[코드 보기](./CharacterAppearance)
+
 ## Spawn / Respawn
 
 Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
