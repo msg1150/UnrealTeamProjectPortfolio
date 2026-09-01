@@ -34,7 +34,7 @@ AI가 Teleport / JumpPad / Jump / Drop을 포함한 특수 이동 경로를 탐�
 Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
 
 - `SpawnSelectionComponent.cpp / .h` : 최초 스폰 분산, 사망 위치 기반 리스폰, Spawn / Possess 처리
-- SpawnPoint Transform의 회전을 서버 Controller와 Owning Client에 함께 적용
+- `SpawnPoint Transform의 회전을 서버 Controller와 Owning Client에 함께 적용
 
 [코드 보기](./SpawnSelectionSystem)
 
