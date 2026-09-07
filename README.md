@@ -37,6 +37,7 @@ AI가 Teleport / JumpPad / Jump / Drop을 포함한 특수 이동 경로를 탐�
 - 일반 캐릭터 메시와 사망 외형을 스폰 시점에 동기화
 - 다중 사망 파츠 구조는 기존 Ragdoll / Impulse 연출을 유지하며, 캐릭터별 전용 파츠가 등록되면 해당 파츠만 교체
 - Doomsday처럼 전신 메시의 머티리얼 슬롯 구성이 다른 스킨은 파츠 역할(몸통·팔·다리·눈)에 맞춰 대응 머티리얼을 적용
+- 런타임에서는 사용할 수 없는 에디터 전용 슬롯 메타데이터를 분리해, 패키징 빌드에서도 안전하게 머티리얼을 탐색
 
 [코드 보기](./CharacterAppearance)
 
@@ -53,8 +54,10 @@ Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
 
 서버 권한으로 동작하는 단방향 포탈 시스템입니다.
 
-- `OneWayTeleportActor.cpp / .h` : Overlap 처리, 출구 이동, 회전 동기화, 입력 잠금
-- `TeleportDataAsset.h` : Launch Angle / Power / Move Lock Time 설정
+- `OneWayTeleportActor.cpp / .h` : Overlap 처리, 임의 Actor 출구 이동, 회전 동기화, 입력 잠금
+- Portal 간 즉시 재진입을 잠가 서로 연결된 출구의 무한 왕복을 방지
+- 실제 이용자에게만 텔레포트 사운드를 재생
+- `TeleportDataAsset.h` : Launch Angle / Power / Move Lock Time 및 사운드 설정
 
 [코드 보기](./Teleport)
 
@@ -64,7 +67,9 @@ Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
 
 - `JsonApplyService.cpp / .h` : 외부 데이터 적용 처리
 - `JsonAssetSyncSubsystem.cpp / .h` : 적용 진입점과 상태 관리
-- `JsonAssetSyncManifest.json` : 동기화 대상과 외부 JSON 소스 메타데이터
+- `JsonAssetSyncEditor.cpp / .h` : Registry 대상 에셋 저장 시 연결된 JSON을 자동 갱신
+- `JsonAssetSyncSchemaExporter.cpp / .h` : DataTable, CurveTable, FloatCurve, DataAsset을 JSON으로 내보내기
+- `JsonAssetSyncManifest.json` : 최신 동기화 대상과 외부 JSON 소스 메타데이터
 
 원본 프로젝트에서는 Unreal Plugin 형태로 구성되어 있었습니다.
 
@@ -80,7 +85,7 @@ Portal / JumpPad / PathLink의 잘못된 레벨 배치를
 - `PathLinkValidationProvider.*`
 - `GameplayValidationProviderRegistry.*`
 - `GameplayValidationWorldScanner.*`
-- `ShootingArenaModule.cpp` : 프로젝트의 실제 `APathLink` API를 Validator Native Bridge에 연결
+- `ShootingArenaModule.cpp` : 프로젝트의 실제 `APathLink` API를 Validator Native Bridge에 연결하고, 게임 월드 초기화 시 LoadingScreen 서브시스템을 확보
 
 원본 프로젝트에서는 Unreal Editor Plugin 형태로 구성되어 있었습니다.
 
