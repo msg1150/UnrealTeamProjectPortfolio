@@ -11,50 +11,50 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 <table>
   <thead>
     <tr>
-      <th><nobr>영역</nobr></th>
-      <th><nobr>시스템</nobr></th>
+      <th width="140">영역</th>
+      <th width="220">시스템</th>
       <th>확인할 내용</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><nobr>외부 데이터</nobr></td>
-      <td><nobr><a href="./JsonAssetSync">JsonAssetSync</a></nobr></td>
+      <td width="140">외부&nbsp;데이터</td>
+      <td width="220"><a href="./JsonAssetSync">JsonAssetSync</a></td>
       <td>Reflection 기반 Manifest/Schema Export, Editor·Runtime 적용 분리, 에셋 저장 시 JSON 기록</td>
     </tr>
     <tr>
-      <td><nobr>제작 도구</nobr></td>
-      <td><nobr><a href="./DataEditor">DataEditor</a></nobr></td>
+      <td width="140">제작&nbsp;도구</td>
+      <td width="220"><a href="./DataEditor">DataEditor</a></td>
       <td>Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집</td>
     </tr>
     <tr>
-      <td><nobr>제작 도구</nobr></td>
-      <td><nobr><a href="./GameplayValidator">GameplayValidator</a></nobr></td>
+      <td width="140">제작&nbsp;도구</td>
+      <td width="220"><a href="./GameplayValidator">GameplayValidator</a></td>
       <td>Portal·JumpPad·PathLink의 레벨 배치 오류를 Provider 구조로 검사</td>
     </tr>
     <tr>
-      <td><nobr>AI 이동</nobr></td>
-      <td><nobr><a href="./PathLink">PathLink</a></nobr></td>
+      <td width="140">AI&nbsp;이동</td>
+      <td width="220"><a href="./PathLink">PathLink</a></td>
       <td>Portal·JumpPad·Jump·Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색</td>
     </tr>
     <tr>
-      <td><nobr>스폰</nobr></td>
-      <td><nobr><a href="./SpawnSelectionSystem">Spawn / Respawn</a></nobr></td>
+      <td width="140">스폰</td>
+      <td width="220"><a href="./SpawnSelectionSystem">Spawn&nbsp;/&nbsp;Respawn</a></td>
       <td>Player·AI 공통 요청 흐름, 최초 스폰 분산과 사망 위치 기반 후보 선택</td>
     </tr>
     <tr>
-      <td><nobr>카메라</nobr></td>
-      <td><nobr><a href="./DeathCam">DeathCam</a></nobr></td>
+      <td width="140">카메라</td>
+      <td width="220"><a href="./DeathCam">DeathCam</a></td>
       <td>Owning Client 전용 카메라, 충돌 보정, Killer Highlight</td>
     </tr>
     <tr>
-      <td><nobr>게임플레이</nobr></td>
-      <td><nobr><a href="./Teleport">Portal</a></nobr></td>
+      <td width="140">게임플레이</td>
+      <td width="220"><a href="./Teleport">Portal</a></td>
       <td>서버 권한 이동, 재진입 방지, Launch·입력 잠금, 이용자 전용 사운드</td>
     </tr>
     <tr>
-      <td><nobr>캐릭터</nobr></td>
-      <td><nobr><a href="./CharacterAppearance">Character Appearance</a></nobr></td>
+      <td width="140">캐릭터</td>
+      <td width="220"><a href="./CharacterAppearance">Character&nbsp;Appearance</a></td>
       <td>DataTable 기반 메시 선택, 복제, 사망 외형 처리</td>
     </tr>
   </tbody>
