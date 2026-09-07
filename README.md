@@ -8,16 +8,57 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 
 ## System Map
 
-| 영역 | 시스템 | 확인할 내용 |
-| --- | --- | --- |
-| 데이터 | [JsonAssetSync](./JsonAssetSync) | Reflection 기반 Manifest/Schema Export, Editor·Runtime 적용 분리, 에셋 저장 시 JSON 기록 |
-| 도구 | [DataEditor](./DataEditor) | Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집 |
-| 도구 | [Validator](./GameplayValidator) | Portal·JumpPad·PathLink의 레벨 배치 오류를 Provider 구조로 검사 |
-| AI | [PathLink](./PathLink) | Portal·JumpPad·Jump·Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색 |
-| 스폰 | [Spawn](./SpawnSelectionSystem) | Player·AI 공통 요청 흐름, 최초 스폰 분산과 사망 위치 기반 후보 선택 |
-| 카메라 | [DeathCam](./DeathCam) | Owning Client 전용 카메라, 충돌 보정, Killer Highlight |
-| 게임 | [Portal](./Teleport) | 서버 권한 이동, 재진입 방지, Launch·입력 잠금, 이용자 전용 사운드 |
-| 캐릭터 | [Appearance](./CharacterAppearance) | DataTable 기반 메시 선택, 복제, 사망 외형 처리 |
+<table>
+  <thead>
+    <tr>
+      <th><nobr>영역</nobr></th>
+      <th><nobr>시스템</nobr></th>
+      <th>확인할 내용</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><nobr>외부 데이터</nobr></td>
+      <td><nobr><a href="./JsonAssetSync">JsonAssetSync</a></nobr></td>
+      <td>Reflection 기반 Manifest/Schema Export, Editor·Runtime 적용 분리, 에셋 저장 시 JSON 기록</td>
+    </tr>
+    <tr>
+      <td><nobr>제작 도구</nobr></td>
+      <td><nobr><a href="./DataEditor">DataEditor</a></nobr></td>
+      <td>Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집</td>
+    </tr>
+    <tr>
+      <td><nobr>제작 도구</nobr></td>
+      <td><nobr><a href="./GameplayValidator">GameplayValidator</a></nobr></td>
+      <td>Portal·JumpPad·PathLink의 레벨 배치 오류를 Provider 구조로 검사</td>
+    </tr>
+    <tr>
+      <td><nobr>AI 이동</nobr></td>
+      <td><nobr><a href="./PathLink">PathLink</a></nobr></td>
+      <td>Portal·JumpPad·Jump·Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색</td>
+    </tr>
+    <tr>
+      <td><nobr>스폰</nobr></td>
+      <td><nobr><a href="./SpawnSelectionSystem">Spawn / Respawn</a></nobr></td>
+      <td>Player·AI 공통 요청 흐름, 최초 스폰 분산과 사망 위치 기반 후보 선택</td>
+    </tr>
+    <tr>
+      <td><nobr>카메라</nobr></td>
+      <td><nobr><a href="./DeathCam">DeathCam</a></nobr></td>
+      <td>Owning Client 전용 카메라, 충돌 보정, Killer Highlight</td>
+    </tr>
+    <tr>
+      <td><nobr>게임플레이</nobr></td>
+      <td><nobr><a href="./Teleport">Portal</a></nobr></td>
+      <td>서버 권한 이동, 재진입 방지, Launch·입력 잠금, 이용자 전용 사운드</td>
+    </tr>
+    <tr>
+      <td><nobr>캐릭터</nobr></td>
+      <td><nobr><a href="./CharacterAppearance">Character Appearance</a></nobr></td>
+      <td>DataTable 기반 메시 선택, 복제, 사망 외형 처리</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Code Reading Guide
 
