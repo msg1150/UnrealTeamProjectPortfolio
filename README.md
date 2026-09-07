@@ -1,103 +1,116 @@
-# Portfolio Code
+# Unreal Team Project Portfolio
 
-Unreal Engine 팀 프로젝트에서 직접 작업한 주요 시스템의 소스 코드를
-포트폴리오 열람용으로 정리한 저장소입니다.
+Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 시스템과 제작 도구를 포트폴리오 열람용으로 정리한 저장소입니다.
 
-원본 팀 프로젝트에서는 Unreal 모듈 규칙과 협업을 위해 Public/Private 및 기능별 폴더로
-분리되어 있었지만, 여기서는 코드를 빠르게 확인할 수 있도록 시스템 단위로 단순화했습니다.
+프로젝트는 Unreal Engine 5.6.1, C++, Blueprint, .NET 8을 사용했습니다. 아래 코드는 원본 프로젝트의 Public/Private 구조와 의존성을 시스템 단위로 재구성한 발췌본입니다.
 
-본 저장소는 코드 열람을 위한 포트폴리오 저장소이며,
-원본 프로젝트의 디렉터리 구조를 단순화했기 때문에 독립 빌드를 목적으로 하지 않습니다.
+> 이 저장소는 코드 리뷰용 포트폴리오입니다. 원본 프로젝트의 에셋, 플러그인 설정, Blueprint, 모듈 의존성이 모두 포함되어 있지 않아 독립 빌드를 지원하지 않습니다.
 
-## PathLink
+## System Map
 
-AI가 Teleport / JumpPad / Jump / Drop을 포함한 특수 이동 경로를 탐색할 수 있도록 구현한 시스템입니다.
+| 영역 | 시스템 | 확인할 내용 |
+| --- | --- | --- |
+| 외부 데이터 | [JsonAssetSync](./JsonAssetSync) | Reflection 기반 Manifest/Schema Export, Editor·Runtime 적용 분리, 에셋 저장 시 JSON 기록 |
+| 제작 도구 | [DataEditor](./DataEditor) | Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집 |
+| 제작 도구 | [GameplayValidator](./GameplayValidator) | Portal·JumpPad·PathLink의 레벨 배치 오류를 Provider 구조로 검사 |
+| AI 이동 | [PathLink](./PathLink) | Portal·JumpPad·Jump·Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색 |
+| 스폰 | [Spawn / Respawn](./SpawnSelectionSystem) | Player·AI 공통 요청 흐름, 최초 스폰 분산과 사망 위치 기반 후보 선택 |
+| 카메라 | [DeathCam](./DeathCam) | Owning Client 전용 카메라, 충돌 보정, Killer Highlight |
+| 게임플레이 | [Portal](./Teleport) | 서버 권한 이동, 재진입 방지, Launch·입력 잠금, 이용자 전용 사운드 |
+| 캐릭터 | [Character Appearance](./CharacterAppearance) | DataTable 기반 메시 선택, 복제, 사망 외형 처리 |
 
-- `PathLink.cpp / .h` : 레벨에 배치되는 Link Actor
-- `PathLinkSubsystem.cpp / .h` : Link 등록, 검증, Static Graph 관리
-- `PathLinkRouteFinder.cpp / .h` : Dijkstra 기반 Route 탐색
+## Code Reading Guide
 
-[코드 보기](./PathLink)
+각 폴더는 기능을 빠르게 검토할 수 있도록 핵심 헤더와 구현 파일을 같은 위치에 두었습니다.
 
-## DeathCam
+- `.h` 파일에서 데이터 구조, 책임 경계, Unreal 반영 지점을 먼저 확인할 수 있습니다.
+- `.cpp` 파일에는 실제 흐름과 예외 처리, 네트워크 또는 Editor 전용 분기가 있습니다.
+- `JsonAssetSync`, `GameplayValidator`는 원본에서 Unreal Plugin으로 구성했습니다.
+- `DataEditor`는 별도 .NET 8 WPF 데스크톱 도구입니다.
 
-사망 시 Killer를 보여주는 카메라 시스템입니다.
+## External Data Pipeline
 
-- `DeathCamActor.cpp / .h` : Camera Collision, Collision Slide, Killer Highlight
-- `DeathCamComponent.cpp / .h` : Owning Client, ViewTarget 생명주기 관리
-- `DeathCamDataAsset.h` : DeathCam 설정 데이터
+### JsonAssetSync
 
-[코드 보기](./DeathCam)
+외부 JSON을 게임 데이터에 반영하는 Unreal Plugin입니다.
 
-## Character Appearance
+- Runtime에서는 메모리 적용만 수행하고, Editor에서는 Apply 및 에셋 저장을 분리합니다.
+- `FJsonAssetSyncSchemaExporter`가 Registry와 Unreal Reflection을 읽어 `JsonAssetSyncManifest.json`을 생성합니다.
+- Manifest에는 필드명, 표시명, C++ 타입, Category, 범위 제약, Enum 선택지, 중첩 Struct 정보가 포함됩니다.
+- 동기화 대상 에셋을 Editor에서 저장하면 연결된 외부 JSON에도 현재 값을 기록합니다.
+- 지원 대상은 DataTable, DataAsset, CurveTable, FloatCurve입니다.
 
-캐릭터 DataTable과 모델링 DataTable을 분리해, 캐릭터별 일반 메시와 사망 외형을 선택하는 시스템입니다.
+[JsonAssetSync 코드 보기](./JsonAssetSync)
 
-- `CharacterAppearanceComponent.cpp / .h` : Character Row → Modeling ID → Modeling Row 조회, 메시 적용 및 복제 처리
-- 일반 캐릭터 메시와 사망 외형을 스폰 시점에 동기화
-- 다중 사망 파츠 구조는 기존 Ragdoll / Impulse 연출을 유지하며, 캐릭터별 전용 파츠가 등록되면 해당 파츠만 교체
-- Doomsday처럼 전신 메시의 머티리얼 슬롯 구성이 다른 스킨은 파츠 역할(몸통·팔·다리·눈)에 맞춰 대응 머티리얼을 적용
-- 런타임에서는 사용할 수 없는 에디터 전용 슬롯 메타데이터를 분리해, 패키징 빌드에서도 안전하게 머티리얼을 탐색
+### DataEditor
 
-[코드 보기](./CharacterAppearance)
+Unreal Editor를 실행하지 않고 프로젝트 데이터를 조회·수정하기 위한 .NET 8 WPF 도구입니다.
+
+- Manifest와 프로젝트 정보를 읽어 편집 가능한 데이터 대상을 구성합니다.
+- DataTable, DataAsset, CurveTable, FloatCurve와 JSON/CSV 흐름을 지원합니다.
+- 단일 실행 파일 배포를 고려해 프로젝트 루트와 상대 경로를 검증합니다.
+
+[DataEditor 코드 보기](./DataEditor)
+
+## Level Validation Tool
+
+플레이 테스트 전에 레벨 배치 오류를 검사하는 Unreal Editor Plugin입니다.
+
+- Portal, JumpPad, PathLink를 Provider로 분리해 검사 대상을 확장합니다.
+- World Scanner가 Actor를 수집하고, Provider Registry가 검사 로직을 연결합니다.
+- Portal의 대상 누락·Self Target, JumpPad의 TargetPoint 누락·잘못된 연결 등을 보고합니다.
+
+[GameplayValidator 코드 보기](./GameplayValidator)
+
+## AI Navigation Assist
+
+NavMesh만으로 해결하기 어려운 특수 이동 구간을 AI 경로에 포함하는 시스템입니다.
+
+- `APathLink`가 레벨의 Link Actor 역할을 맡습니다.
+- `PathLinkSubsystem`이 등록, Endpoint 검증, Static Graph 생성을 담당합니다.
+- `PathLinkRouteFinder`가 Dijkstra로 Shortest Route를 계산합니다.
+- Portal, JumpPad, Jump, Drop을 동일한 경로 탐색 흐름으로 처리합니다.
+
+[PathLink 코드 보기](./PathLink)
 
 ## Spawn / Respawn
 
 Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
 
-- `SpawnSelectionComponent.cpp / .h` : 최초 스폰 분산, 사망 위치 기반 리스폰, Spawn / Possess 처리
-- SpawnPoint Transform의 회전을 서버 Controller와 Owning Client에 함께 적용
+- 최초 스폰에서는 사용 가능한 SpawnPoint에 캐릭터를 분산합니다.
+- 리스폰에서는 사망 위치와 SpawnPoint의 거리를 기준으로 후보를 구성합니다.
+- SpawnPoint 회전은 서버 Controller와 Owning Client에 함께 반영합니다.
 
-[코드 보기](./SpawnSelectionSystem)
+[Spawn / Respawn 코드 보기](./SpawnSelectionSystem)
 
-## Portal / Teleport
+## DeathCam
 
-서버 권한으로 동작하는 단방향 포탈 시스템입니다.
+사망한 Owning Client에만 Killer를 보여주는 카메라 시스템입니다.
 
-- `OneWayTeleportActor.cpp / .h` : Overlap 처리, 임의 Actor 출구 이동, 회전 동기화, 입력 잠금
-- Portal 간 즉시 재진입을 잠가 서로 연결된 출구의 무한 왕복을 방지
-- 실제 이용자에게만 텔레포트 사운드를 재생
-- `TeleportDataAsset.h` : Launch Angle / Power / Move Lock Time 및 사운드 설정
+- `DeathCamComponent`가 ViewTarget 생명주기와 Owning Client 처리를 담당합니다.
+- `DeathCamActor`가 Sweep, Collision Slide, 카메라 위치 보정을 처리합니다.
+- Killer가 가려진 경우 Outline/Fill 방식의 Highlight를 적용합니다.
 
-[코드 보기](./Teleport)
+[DeathCam 코드 보기](./DeathCam)
 
-## JsonAssetSync
+## Portal
 
-외부 JSON 데이터를 Unreal Editor와 Runtime에서 적용하기 위한 시스템입니다.
+서버 권한으로 동작하는 단방향 Portal 시스템입니다.
 
-- `JsonApplyService.cpp / .h` : 외부 데이터 적용 처리
-- `JsonAssetSyncSubsystem.cpp / .h` : 적용 진입점과 상태 관리
-- `JsonAssetSyncEditor.cpp / .h` : Registry 대상 에셋 저장 시 연결된 JSON을 자동 갱신
-- `JsonAssetSyncSchemaExporter.cpp / .h` : DataTable, CurveTable, FloatCurve, DataAsset을 JSON으로 내보내기
-- `JsonAssetSyncManifest.json` : 최신 동기화 대상과 외부 JSON 소스 메타데이터
+- `OneWayTeleportActor`가 Overlap, 출구 이동, Controller 회전 동기화, `ForceNetUpdate`를 처리합니다.
+- Portal A에서 B로 이동한 직후 발생할 수 있는 Overlap 재진입을 잠가 무한 왕복을 방지합니다.
+- `TeleportDataAsset`에서 Launch Angle, Power, Move Lock Time, 사운드 설정을 조정합니다.
+- 실제 Portal을 이용한 클라이언트에서만 사운드를 재생합니다.
 
-원본 프로젝트에서는 Unreal Plugin 형태로 구성되어 있었습니다.
+[Portal 코드 보기](./Teleport)
 
-[코드 보기](./JsonAssetSync)
+## Character Appearance
 
-## GameplayValidator
+캐릭터와 모델링 DataTable을 분리해 일반 메시와 사망 외형을 선택하는 시스템입니다.
 
-Portal / JumpPad / PathLink의 잘못된 레벨 배치를
-플레이 테스트 전에 검사하는 Editor Validation Tool입니다.
+- `CharacterAppearanceComponent`가 Character Row에서 Modeling ID를 읽고, Modeling Row를 조회해 메시를 적용합니다.
+- 스폰 시점에 일반 외형과 사망 외형을 동기화합니다.
+- 전용 사망 파츠가 있으면 해당 파츠만 교체하고, 없는 파츠는 기존 Ragdoll/Impulse 연출을 유지합니다.
+- 에디터 전용 슬롯 메타데이터를 분리해 패키징 빌드에서도 머티리얼 탐색을 안전하게 처리합니다.
 
-- `PortalValidationProvider.*`
-- `JumpPadValidationProvider.*`
-- `PathLinkValidationProvider.*`
-- `GameplayValidationProviderRegistry.*`
-- `GameplayValidationWorldScanner.*`
-- `ShootingArenaModule.cpp` : 프로젝트의 실제 `APathLink` API를 Validator Native Bridge에 연결하고, 게임 월드 초기화 시 LoadingScreen 서브시스템을 확보
-
-원본 프로젝트에서는 Unreal Editor Plugin 형태로 구성되어 있었습니다.
-
-[코드 보기](./GameplayValidator)
-
-## DataEditor
-
-Unreal Editor를 실행하지 않고 외부 데이터를 조회·수정하기 위한 데스크톱 편집 도구입니다.
-
-- `MainWindow.xaml / .cs`
-- `Core/`
-- `Editors/`
-- `JsonAssetDataEditor.csproj`
-
-[코드 보기](./DataEditor)
+[Character Appearance 코드 보기](./CharacterAppearance)
