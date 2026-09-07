@@ -10,14 +10,14 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 
 | 영역 | 시스템 | 확인할 내용 |
 | --- | --- | --- |
-| 외부 데이터 | [JsonAssetSync](./JsonAssetSync) | Reflection 기반 Manifest/Schema Export, Editor·Runtime 적용 분리, 에셋 저장 시 JSON 기록 |
-| 제작 도구 | [DataEditor](./DataEditor) | Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집 |
-| 제작 도구 | [GameplayValidator](./GameplayValidator) | Portal·JumpPad·PathLink의 레벨 배치 오류를 Provider 구조로 검사 |
-| AI 이동 | [PathLink](./PathLink) | Portal·JumpPad·Jump·Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색 |
-| 스폰 | [Spawn / Respawn](./SpawnSelectionSystem) | Player·AI 공통 요청 흐름, 최초 스폰 분산과 사망 위치 기반 후보 선택 |
+| 데이터 | [JsonAssetSync](./JsonAssetSync) | Reflection 기반 Manifest/Schema Export, Editor·Runtime 적용 분리, 에셋 저장 시 JSON 기록 |
+| 도구 | [DataEditor](./DataEditor) | Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집 |
+| 도구 | [Validator](./GameplayValidator) | Portal·JumpPad·PathLink의 레벨 배치 오류를 Provider 구조로 검사 |
+| AI | [PathLink](./PathLink) | Portal·JumpPad·Jump·Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색 |
+| 스폰 | [Spawn](./SpawnSelectionSystem) | Player·AI 공통 요청 흐름, 최초 스폰 분산과 사망 위치 기반 후보 선택 |
 | 카메라 | [DeathCam](./DeathCam) | Owning Client 전용 카메라, 충돌 보정, Killer Highlight |
-| 게임플레이 | [Portal](./Teleport) | 서버 권한 이동, 재진입 방지, Launch·입력 잠금, 이용자 전용 사운드 |
-| 캐릭터 | [Character Appearance](./CharacterAppearance) | DataTable 기반 메시 선택, 복제, 사망 외형 처리 |
+| 게임 | [Portal](./Teleport) | 서버 권한 이동, 재진입 방지, Launch·입력 잠금, 이용자 전용 사운드 |
+| 캐릭터 | [Appearance](./CharacterAppearance) | DataTable 기반 메시 선택, 복제, 사망 외형 처리 |
 
 ## Code Reading Guide
 
