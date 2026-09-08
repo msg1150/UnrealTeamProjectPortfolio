@@ -99,7 +99,9 @@ Unreal Editor를 실행하지 않고 프로젝트 데이터를 조회·수정하
 
 - Portal, JumpPad, PathLink를 Provider로 분리해 검사 대상을 확장합니다.
 - World Scanner가 Actor를 수집하고, Provider Registry가 검사 로직을 연결합니다.
-- Portal의 대상 누락·Self Target, JumpPad의 TargetPoint 누락·잘못된 연결 등을 보고합니다.
+- Portal은 활성 상태일 때 `Exit Target` 누락·자기 자신 연결을 검사하고, 공용 Teleport DA의 Launch Angle·Power가 유효한지도 확인합니다.
+- JumpPad는 ApexTime / LaunchAngle 유형을 별도 슬롯으로 관리하며, 각 유형의 TargetPoint 누락·자기 자신 연결·동일 위치를 보고합니다.
+- Reflection 유틸리티로 Blueprint 구현에 직접 의존하지 않고 bool·숫자·Actor 속성을 읽어 검사합니다.
 
 [GameplayValidator 코드 보기](./GameplayValidator)
 
