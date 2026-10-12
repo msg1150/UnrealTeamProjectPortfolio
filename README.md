@@ -2,9 +2,9 @@
 
 Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 시스템과 제작 도구를 포트폴리오 열람용으로 정리한 저장소입니다.
 
-프로젝트는 Unreal Engine 5.6.1, C++, Blueprint, .NET 8을 사용했습니다. 아래 코드는 원본 프로젝트의 Public/Private 구조와 의존성을 시스템 단위로 재구성한 발췌본입니다.
+프로젝트는 Unreal Engine 5.6.1, C++, Blueprint, .NET 8을 사용했습니다. C++ 코드는 원본 프로젝트의 Public/Private 구조와 의존성을 시스템 단위로 재구성한 발췌본이며, 직접 구현한 기능의 노드를 검토할 수 있도록 무기 Blueprint 12개와 조준 AnimBP 2개도 포함했습니다.
 
-> 이 저장소는 코드 리뷰용 포트폴리오입니다. 원본 프로젝트의 에셋, 플러그인 설정, Blueprint, 모듈 의존성이 모두 포함되어 있지 않아 독립 빌드를 지원하지 않습니다.
+> 이 저장소는 C++ 코드와 Blueprint 노드 리뷰용 포트폴리오입니다. 원본 프로젝트의 전체 에셋, 플러그인 설정, Blueprint, 모듈 의존성이 모두 포함되어 있지 않아 독립 빌드나 실행을 지원하지 않습니다.
 
 ## System Map
 
@@ -17,6 +17,16 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td width="140">무기</td>
+      <td width="220"><a href="./Blueprints/Weapon">Weapon Blueprint</a></td>
+      <td>공통 발사 흐름, 무기별 발사 처리, 투사체 생성과 충돌, 효과와 사운드 연동</td>
+    </tr>
+    <tr>
+      <td width="140">애니메이션</td>
+      <td width="220"><a href="./Blueprints/WeaponAimAnimation">Weapon Aim AnimBP</a></td>
+      <td>플라즈마건, 로켓런처의 조준 방향과 무기 자세를 맞추는 AnimGraph</td>
+    </tr>
     <tr>
       <td width="140">외부&nbsp;데이터</td>
       <td width="220"><a href="./JsonAssetSync">JsonAssetSync</a></td>
@@ -88,6 +98,38 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 - `.cpp` 파일에는 실제 흐름과 예외 처리, 네트워크 또는 Editor 전용 분기가 있습니다.
 - `JsonAssetSync`, `GameplayValidator`는 원본에서 Unreal Plugin으로 구성했습니다.
 - `DataEditor`는 별도 .NET 8 WPF 데스크톱 도구입니다.
+- `Blueprints/Weapon`과 `Blueprints/WeaponAimAnimation`에는 구현 노드 검토용 `.uasset` 파일을 기능별로 모았습니다. 각 폴더 바로 아래에서 파일을 확인할 수 있습니다.
+- `.uasset`은 바이너리이므로 GitHub 웹에서는 노드 그래프를 직접 볼 수 없습니다. 노드 검토에는 원본 프로젝트와 의존성을 갖춘 Unreal Editor 5.6.1 환경이 필요합니다.
+
+## Blueprint Implementations
+
+직접 기능을 구현한 Blueprint 위주로 14개를 선별했습니다. 기존 GameMode, 캐릭터, UI 등에 기능 호출 노드나 컴포넌트만 연결한 BP는 포함하지 않았습니다. 초기 프로토타입, 테스트/디버그 BP, 인터페이스와 데이터 클래스도 제외했습니다.
+
+| 구분 | 파일 수 | 확인할 내용 |
+| --- | --- | --- |
+| 무기 공통/개별 BP | 7 | `BP_WeaponBase`와 MachineGun, Pistol, PlasmaGun, RailGun, RocketLauncher, ShotGun의 발사 처리 |
+| 투사체 발사 컴포넌트 | 1 | `BPC_ProjectileFire`의 투사체 생성과 발사 흐름 |
+| 투사체 BP | 4 | `BP_ProjectileBase`, `BP_PistolProjectile`, `BP_PlasmaProjectile`, `BP_RocketLauncherProjectile`의 공통 처리와 충돌, 폭발, 효과/사운드 연동 |
+| 무기 조준 AnimBP | 2 | 플라즈마건과 로켓런처의 조준 방향, 무기 자세 보정 |
+
+### Weapon Blueprint
+
+- [BP_WeaponBase](./Blueprints/Weapon/BP_WeaponBase.uasset)에서 `TryFire`, `StartFire` 등의 공통 발사 흐름과 효과 처리를 확인할 수 있습니다.
+- 무기별 BP에는 각 무기에 맞는 발사 처리를 분리했습니다. 투사체를 사용하는 무기는 [BPC_ProjectileFire](./Blueprints/Weapon/BPC_ProjectileFire.uasset)와 투사체 BP를 함께 확인하면 됩니다.
+- 투사체 BP에는 생성 이후의 충돌 처리와 폭발, 히트 효과, 사운드 관련 노드가 포함되어 있습니다.
+
+[무기 Blueprint 12개 보기](./Blueprints/Weapon)
+
+### Weapon Aim Animation
+
+- [Steel_ABP_TP_BGH_PlasmaGun_AimAligned](./Blueprints/WeaponAimAnimation/Steel_ABP_TP_BGH_PlasmaGun_AimAligned.uasset)
+- [Steel_ABP_TP_BGH_RocketLauncher_AimAligned](./Blueprints/WeaponAimAnimation/Steel_ABP_TP_BGH_RocketLauncher_AimAligned.uasset)
+
+플라즈마건과 로켓런처의 조준 방향에 맞춰 무기 자세를 보정하는 AnimBP입니다. AnimGraph와 조준 관련 갱신 흐름을 확인할 수 있습니다.
+
+줌 BP는 이번 열람 대상에서 제외했고, 현재 사용하지 않는 플레이어 텔레포트 스킬 BP도 포함하지 않았습니다. 아래 `Teleport` 폴더의 레벨 Portal 시스템과는 별개입니다.
+
+Blueprint 파일은 열람하기 쉽도록 원본의 중간 폴더를 생략해 모았습니다. 머티리얼, 메시, 사운드, DataAsset 인스턴스 등의 의존성은 포함하지 않았으며, 그대로 다른 프로젝트의 Content 폴더에 복사해 실행하는 패키지가 아닙니다.
 
 ## External Data Pipeline
 
