@@ -6,6 +6,16 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 
 > 이 저장소는 C++ 코드와 Blueprint 노드 리뷰용 포트폴리오입니다. 원본 프로젝트의 전체 에셋, 플러그인 설정, Blueprint, 모듈 의존성이 모두 포함되어 있지 않아 독립 빌드나 실행을 지원하지 않습니다.
 
+## Latest Sync
+
+2026-10-14 기준 [BattleArena main의 7c0bf94c0 커밋](https://github.com/Qusbell/BattleArena/commit/7c0bf94c0f8dee011e1e1d5252d410502c1aaf3d)과 대조해 갱신했습니다.
+
+- 닉네임의 Line Trace 우선 판정과 Sphere Trace 보조 검색, 조준점 위/아래 표시, 잘못된 화면 변환 방어를 반영했습니다.
+- 사망 드롭의 착지 중심 위치, 추가 높이 설정과 최종 착지 위치 복제를 반영했습니다.
+- Weapon C++ 보조 시스템과 Editor 연결 도구를 추가했습니다. 기존 BP 구현과 함께 조준, 투사체 수렴, 1인칭 렌더링, 플레이어/환경 충돌 분리를 검토할 수 있습니다.
+- `BP_WeaponBase`, `BP_PlasmaProjectile`, `BP_RocketLauncherProjectile`를 최신 원본으로 갱신했습니다. 수록 BP는 기존과 같은 14개입니다.
+- 관련 Unreal Automation 테스트 코드를 수록했으며, 이번 동기화에서 빌드나 실행 검증은 수행하지 않았습니다.
+
 ## System Map
 
 <table>
@@ -17,6 +27,11 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
     </tr>
   </thead>
   <tbody>
+    <tr>
+      <td width="140">무기</td>
+      <td width="220"><a href="./Weapon">Weapon C++ Systems</a></td>
+      <td>조준 정렬, 투사체 수렴, 1인칭 렌더링, 플레이어/환경 충돌 분리, 초기 로드아웃과 효과 연동</td>
+    </tr>
     <tr>
       <td width="140">무기</td>
       <td width="220"><a href="./Blueprints/Weapon">Weapon Blueprint</a></td>
@@ -98,6 +113,7 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 - `.cpp` 파일에는 실제 흐름과 예외 처리, 네트워크 또는 Editor 전용 분기가 있습니다.
 - `JsonAssetSync`, `GameplayValidator`는 원본에서 Unreal Plugin으로 구성했습니다.
 - `DataEditor`는 별도 .NET 8 WPF 데스크톱 도구입니다.
+- `Weapon`에는 무기 BP와 AnimBP에서 사용하는 C++ 보조 코드와 테스트를 모았고, `Weapon/Editor`에는 Custom AnimGraph 노드와 BP 연결 도구를 분리했습니다.
 - `Blueprints/Weapon`과 `Blueprints/WeaponAimAnimation`에는 구현 노드 검토용 `.uasset` 파일을 기능별로 모았습니다. 각 폴더 바로 아래에서 파일을 확인할 수 있습니다.
 - `.uasset`은 바이너리이므로 GitHub 웹에서는 노드 그래프를 직접 볼 수 없습니다. 노드 검토에는 원본 프로젝트와 의존성을 갖춘 Unreal Editor 5.6.1 환경이 필요합니다.
 
@@ -117,6 +133,7 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 - [BP_WeaponBase](./Blueprints/Weapon/BP_WeaponBase.uasset)에서 `TryFire`, `StartFire` 등의 공통 발사 흐름과 효과 처리를 확인할 수 있습니다.
 - 무기별 BP에는 각 무기에 맞는 발사 처리를 분리했습니다. 투사체를 사용하는 무기는 [BPC_ProjectileFire](./Blueprints/Weapon/BPC_ProjectileFire.uasset)와 투사체 BP를 함께 확인하면 됩니다.
 - 투사체 BP에는 생성 이후의 충돌 처리와 폭발, 히트 효과, 사운드 관련 노드가 포함되어 있습니다.
+- 최신 Plasma, RocketLauncher 투사체는 `ProjectileWorldCollisionComponent`의 `OnResolvedImpact`로 기존 충돌 그래프와 연결됩니다. `BP_WeaponBase`의 서버 충돌 알림에서는 같은 발사 ID의 클라이언트 시각용 투사체를 정리합니다. C++ 구현은 [Weapon 폴더](./Weapon)에서 함께 확인할 수 있습니다.
 
 [무기 Blueprint 12개 보기](./Blueprints/Weapon)
 
@@ -130,6 +147,22 @@ Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 �
 줌 BP는 이번 열람 대상에서 제외했고, 현재 사용하지 않는 플레이어 텔레포트 스킬 BP도 포함하지 않았습니다. 아래 `Teleport` 폴더의 레벨 Portal 시스템과는 별개입니다.
 
 Blueprint 파일은 열람하기 쉽도록 원본의 중간 폴더를 생략해 모았습니다. 머티리얼, 메시, 사운드, DataAsset 인스턴스 등의 의존성은 포함하지 않았으며, 그대로 다른 프로젝트의 Content 폴더에 복사해 실행하는 패키지가 아닙니다.
+
+## Weapon C++ Systems
+
+무기 Blueprint와 조준 AnimBP의 동작을 보조하는 C++ 시스템입니다.
+
+- `WeaponAimAlignmentComponent`, `AnimNode_WeaponAimAlignment`와 수학 유틸리티가 무기 조준 정렬과 AnimGraph 처리를 담당합니다.
+- `WeaponProjectileAimLibrary`가 카메라 조준점과 총구 위치를 기준으로 발사 좌표를 구하고, 총구가 벽에 막혔을 때의 안전한 시작 위치를 처리합니다. 서버가 정한 비행 목표를 공유하고, 클라이언트 시각용 투사체의 시작 위치는 로컬 FP/TP 총구에 맞춥니다.
+- `ProjectileConvergenceComponent`는 총구에서 합류점까지의 이동과 이후 전방 비행을 분리합니다. 한 프레임에 합류점을 통과할 때에도 이동 구간을 나눠 처리합니다.
+- `ProjectileFirstPersonRenderingComponent`는 로컬 플레이어의 팔, 무기, 총구 효과에 1인칭 렌더링을 적용합니다. 무기 Bounds와 캐릭터 Capsule의 여유 공간, FOV 보정에 맞춰 렌더 스케일을 줄이고, 로컬 활성 시점의 Near Clip을 조정합니다. 무기 교체, 비활성화, 종료 시 기존 상태를 복구합니다.
+- `ProjectileWorldCollisionComponent`는 기존 Root Sphere의 플레이어 판정 반경과 별도 환경 판정 반경을 사용합니다. 실제 이동 구간을 Sweep하고 먼저 닿은 벽 또는 플레이어를 선택하며, 큰 플레이어 판정 반경으로 인한 벽 너머 피해를 추가 가시성 검사로 차단합니다.
+- `OnResolvedImpact`가 기존 BP의 충돌, 피해, 폭발 그래프를 호출합니다. `DestroyProjectileVisualsById`는 서버 충돌 알림에 대응해 같은 무기와 발사 ID의 비피해 시각용 복사본만 정리합니다.
+- 초기 무기 지급은 `InitialWeaponLoadoutComponent`와 DataAsset으로 분리했고, `WeaponPresentationLibrary`, `ProjectileMuzzleFlashLibrary`, `WeaponBeamEffectLibrary`는 무기별 메시와 효과 연결을 보조합니다.
+- `Weapon/Editor`에는 Custom AnimGraph 노드와 기존 BP에 조준, 총구 효과, 충돌 컴포넌트 및 이벤트를 연결하는 Editor 전용 도구를 포함했습니다. 런타임 모듈과 분리해 읽어야 합니다.
+- `FirstPersonRenderingTests.cpp`, `ProjectileConvergenceTests.cpp`, `ProjectileSplitCollisionTests.cpp`, `WeaponProjectileAimTests.cpp`를 함께 수록했습니다. 테스트 실행에는 원본 프로젝트 환경이 필요합니다.
+
+[Weapon C++ 코드 보기](./Weapon)
 
 ## External Data Pipeline
 
@@ -237,11 +270,14 @@ Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
 - `ShooterOutlineComponent`가 원본 메시를 변경하지 않는 CustomDepth 전용 프록시를 만들고, 카메라별 SceneViewExtension으로 외곽선을 적용합니다.
 - 일반 대상과 복수 대상의 Stencil을 분리하고, DeathCam용 값 1은 유지합니다. OwnerOnly 표시, 숨김 파츠, 분할 화면의 카메라별 가시성을 반영하며 DeathCam 중에는 일반 표시를 중지합니다.
 - `ShooterNicknameComponent`가 실제 조준점에서 피해 판정용 충돌을 추적하고, 벽 너머나 숨겨진 캐릭터, 사망한 캐릭터를 표시 대상에서 제외합니다. 기존 장착 아이템의 판정 채널과 사거리는 읽기 전용으로 참조합니다.
+- 닉네임 판정은 정확한 Line Trace 대상을 우선합니다. 유효한 대상이 없을 때만 설정된 반경의 Sphere Trace로 주변 후보를 찾고, 원래 충돌 응답을 사용하는 별도 시야 검사로 벽 뒤 대상을 제외합니다. 실제 피해 판정 크기는 바꾸지 않으며 보조 검색은 끄거나 반경을 0으로 설정할 수 있습니다.
 - `ShooterNicknameWidget`이 기존 HUD를 변경하지 않는 별도 Overlay로 닉네임을 그립니다. 글꼴, 외곽선, 색상, DPI 보정 위치와 조준 이탈 후 유지 시간을 설정할 수 있습니다.
+- `bShowAboveCrosshair`로 닉네임을 조준점 위/아래에 배치합니다. 유효하지 않은 Viewport, 0 크기 화면, 역변환할 수 없는 Render Transform은 좌표 변환 전에 걸러냅니다.
 - `ShooterRevengeComponent`가 기존 PlayerState의 `RevengeTarget`을 서버에서 읽고 Owning Client에만 복제합니다. Pawn이 리스폰해도 같은 PlayerState를 기준으로 복수 대상을 식별하며, 기존 킬과 사망 규칙은 변경하지 않습니다.
 - `ShooterDisplayLibrary`가 기존 Blueprint의 생존 상태와 표시 이름을 읽으며, 런타임 스타일은 Settings DataAsset에 덮어쓰지 않습니다.
 - 원본 `AMyPlayerController` 생성자에서 Outline, Nickname, Revenge 컴포넌트를 연결합니다. 렌더링에는 `r.CustomDepth=3`, Post Process 머티리얼, Settings DataAsset과 `UMG`, `Slate`, `SlateCore`, `RHI`, `RenderCore` 모듈이 필요하며 에셋과 전체 Controller는 이 발췌본에 포함하지 않았습니다.
 - `CharacterDisplayTests.cpp`, `RevengePlayerStateBridgeTests.cpp`에 충돌 판정, 가시성, 프록시 정리, 복수 대상 동기화 관련 Unreal Automation 테스트가 포함됩니다. 테스트 실행에는 원본 프로젝트와 에셋이 필요합니다.
+- `ShooterNicknameSphereTests.cpp`에는 정확한 조준 대상 우선, 보조 검색 ON/OFF, 벽 가림, 초기 Overlap, 거리 제한과 잘못된 입력 관련 회귀 테스트가 포함됩니다.
 
 [Character Display 코드 보기](./CharacterDisplay)
 
@@ -278,6 +314,7 @@ Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
 
 - `DeathDropSubsystem`이 체력 변경 직전 호출되어 중복 처리를 막고, 설정된 최대 개수만큼 후보를 중복 없이 무작위로 선택합니다.
 - `DeathDropCarrier`가 방사 방향 발사, 수평 감속, 착지, 픽업 연결과 상태 복제를 담당합니다.
+- 바닥 접촉점과 법선, 물리 구체 반경으로 착지 중심을 다시 계산하고, `SettlementHeightOffset`만큼 월드 위쪽으로 띄워 드롭이 바닥에 묻히는 현상을 줄입니다. 서버의 `SettledLocation`을 복제해 클라이언트도 같은 위치에서 물리를 정지합니다.
 - 활성 버프는 기존 서버 종료 시각을 유지하며, 미획득 드롭은 설정된 시간 후 제거합니다.
 - `DeathDropSettings`에서 후보 종류, 발사 범위, 감속, 수명, 픽업 데이터를 조정합니다.
 - 원본의 초기 로드아웃, 픽업 Blueprint에 의존하는 발췌 코드입니다.
