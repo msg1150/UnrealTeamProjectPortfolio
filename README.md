@@ -74,5 +74,3 @@ Unreal Automation 테스트 코드를 함께 수록했습니다. 대표 확인 �
 - [충돌 분리](./Weapon/ProjectileSplitCollisionTests.cpp): 벽과 플레이어의 충돌 순서, 얇은 벽 뒤 명중 차단, 이동 구간과 컴포넌트 생명주기
 - [1인칭 렌더링](./Weapon/FirstPersonRenderingTests.cpp): 캐릭터 충돌 영역 안의 스케일 계산, FOV와 Near Clip 입력 안전성
 - [닉네임 보조 검색](./CharacterDisplay/ShooterNicknameSphereTests.cpp): 정확한 조준 대상 우선, 보조 검색 설정, 벽 가림과 잘못된 입력
-
-코드 동기화 기준은 2026-10-14의 [BattleArena main 7c0bf94c0](https://github.com/Qusbell/BattleArena/commit/7c0bf94c0f8dee011e1e1d5252d410502c1aaf3d)입니다. 해당 동기화에서 빌드, 테스트 실행과 실제 플레이 검증은 수행하지 않았으며, 테스트 실행에는 원본 프로젝트 환경이 필요합니다.
