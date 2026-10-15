@@ -1,322 +1,78 @@
-# Unreal Team Project Portfolio
+# BattleArena - Game Programming Portfolio
 
-Unreal Engine 멀티플레이 팀 프로젝트에서 구현한 게임플레이 시스템과 제작 도구를 포트폴리오 열람용으로 정리한 저장소입니다.
+BattleArena 멀티플레이 슈팅 팀 프로젝트에서 직접 구현한 게임플레이 시스템과 제작 도구를 정리한 코드 열람용 저장소입니다.
 
-프로젝트는 Unreal Engine 5.6.1, C++, Blueprint, .NET 8을 사용했습니다. C++ 코드는 원본 프로젝트의 Public/Private 구조와 의존성을 시스템 단위로 재구성한 발췌본이며, 직접 구현한 기능의 노드를 검토할 수 있도록 무기 Blueprint 12개와 조준 AnimBP 2개도 포함했습니다.
+- 개발 기간: 2025.12 ~ 현재 진행 중
+- 개발 환경: Unreal Engine 5.6.1, C++, Blueprint, .NET 8 WPF
+- [Notion 기술 문서](https://pjhgameprogramming.notion.site/Game-Programming-Technical-Wiki-3cea186e6315804cb41ff052b738453a): 시스템 설계, 알고리즘, 문제 해결 과정과 원본 프로젝트 연결 방법
 
-> 이 저장소는 C++ 코드와 Blueprint 노드 리뷰용 포트폴리오입니다. 원본 프로젝트의 전체 에셋, 플러그인 설정, Blueprint, 모듈 의존성이 모두 포함되어 있지 않아 독립 빌드나 실행을 지원하지 않습니다.
+> C++ 코드와 선별한 Blueprint를 모은 발췌본입니다. 전체 에셋과 모듈 의존성을 포함하지 않아 독립 빌드나 실행을 지원하지 않습니다.
 
-## Latest Sync
+## 핵심 구현과 코드 위치
 
-2026-10-14 기준 [BattleArena main의 7c0bf94c0 커밋](https://github.com/Qusbell/BattleArena/commit/7c0bf94c0f8dee011e1e1d5252d410502c1aaf3d)과 대조해 갱신했습니다.
-
-- 닉네임의 Line Trace 우선 판정과 Sphere Trace 보조 검색, 조준점 위/아래 표시, 잘못된 화면 변환 방어를 반영했습니다.
-- 사망 드롭의 착지 중심 위치, 추가 높이 설정과 최종 착지 위치 복제를 반영했습니다.
-- Weapon C++ 보조 시스템과 Editor 연결 도구를 추가했습니다. 기존 BP 구현과 함께 조준, 투사체 수렴, 1인칭 렌더링, 플레이어/환경 충돌 분리를 검토할 수 있습니다.
-- `BP_WeaponBase`, `BP_PlasmaProjectile`, `BP_RocketLauncherProjectile`를 최신 원본으로 갱신했습니다. 수록 BP는 기존과 같은 14개입니다.
-- 관련 Unreal Automation 테스트 코드를 수록했으며, 이번 동기화에서 빌드나 실행 검증은 수행하지 않았습니다.
-
-## System Map
-
-<table>
-  <thead>
-    <tr>
-      <th width="140">영역</th>
-      <th width="220">시스템</th>
-      <th>확인할 내용</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td width="140">무기</td>
-      <td width="220"><a href="./Weapon">Weapon C++ Systems</a></td>
-      <td>조준 정렬, 투사체 수렴, 1인칭 렌더링, 플레이어/환경 충돌 분리, 초기 로드아웃과 효과 연동</td>
-    </tr>
-    <tr>
-      <td width="140">무기</td>
-      <td width="220"><a href="./Blueprints/Weapon">Weapon Blueprint</a></td>
-      <td>공통 발사 흐름, 무기별 발사 처리, 투사체 생성과 충돌, 효과와 사운드 연동</td>
-    </tr>
-    <tr>
-      <td width="140">애니메이션</td>
-      <td width="220"><a href="./Blueprints/WeaponAimAnimation">Weapon Aim AnimBP</a></td>
-      <td>플라즈마건, 로켓런처의 조준 방향과 무기 자세를 맞추는 AnimGraph</td>
-    </tr>
-    <tr>
-      <td width="140">외부&nbsp;데이터</td>
-      <td width="220"><a href="./JsonAssetSync">JsonAssetSync</a></td>
-      <td>Reflection 기반 Manifest/Schema Export, Editor, Runtime 적용 분리, 에셋 저장 시 JSON 기록</td>
-    </tr>
-    <tr>
-      <td width="140">제작&nbsp;도구</td>
-      <td width="220"><a href="./DataEditor">DataEditor</a></td>
-      <td>Manifest를 읽는 .NET 8 데이터 편집 도구, JSON/CSV 편집</td>
-    </tr>
-    <tr>
-      <td width="140">제작&nbsp;도구</td>
-      <td width="220"><a href="./GameplayValidator">GameplayValidator</a></td>
-      <td>Portal, JumpPad, PathLink의 레벨 배치 오류를 Provider 구조로 검사</td>
-    </tr>
-    <tr>
-      <td width="140">AI&nbsp;이동</td>
-      <td width="220"><a href="./PathLink">PathLink</a></td>
-      <td>Portal, JumpPad, Jump, Drop을 포함하는 Static Graph와 Dijkstra 경로 탐색</td>
-    </tr>
-    <tr>
-      <td width="140">스폰</td>
-      <td width="220"><a href="./SpawnSelectionSystem">Spawn&nbsp;/&nbsp;Respawn</a></td>
-      <td>Player, AI 공통 요청 흐름, 타입별 스폰 선택, 자동 포인트 등록, 사망 위치 기반 후보 선택, 스폰 사운드</td>
-    </tr>
-    <tr>
-      <td width="140">카메라</td>
-      <td width="220"><a href="./DeathCam">DeathCam</a></td>
-      <td>Owning Client 전용 카메라, 충돌 보정, Killer Highlight</td>
-    </tr>
-    <tr>
-      <td width="140">게임플레이</td>
-      <td width="220"><a href="./Teleport">Portal</a></td>
-      <td>서버 권한 이동, 재진입 방지, 클라이언트별 출구 화면, 동적 해상도, Niagara 효과</td>
-    </tr>
-    <tr>
-      <td width="140">캐릭터</td>
-      <td width="220"><a href="./CharacterAppearance">Character&nbsp;Appearance</a></td>
-      <td>DataTable 기반 메시 선택, 복제, 사망 외형 처리</td>
-    </tr>
-    <tr>
-      <td width="140">캐릭터&nbsp;표시</td>
-      <td width="220"><a href="./CharacterDisplay">Character&nbsp;Display</a></td>
-      <td>로컬 외곽선, 조준 대상 닉네임, PlayerState 기반 복수 대상 표시</td>
-    </tr>
-    <tr>
-      <td width="140">오디오</td>
-      <td width="220"><a href="./Audio">BGM</a></td>
-      <td>상태, 맵별 곡 선택, 비동기 로드, Fade 전환, Pause 중 반복 재생</td>
-    </tr>
-    <tr>
-      <td width="140">맵&nbsp;전환</td>
-      <td width="220"><a href="./Loading">Loading</a></td>
-      <td>서버 준비, 실제 참가자 대기, 로딩 화면과 입력 잠금, BGM 시작 연동</td>
-    </tr>
-    <tr>
-      <td width="140">아이템</td>
-      <td width="220"><a href="./DeathDrop">Death&nbsp;Drop</a></td>
-      <td>사망 시 드롭 후보 선택, 물리 발사, 착지 복제, 버프 종료 시각 보존</td>
-    </tr>
-  </tbody>
-</table>
-
-## Code Reading Guide
-
-각 폴더는 기능을 빠르게 검토할 수 있도록 핵심 헤더와 구현 파일을 같은 위치에 두었습니다.
-
-- `.h` 파일에서 데이터 구조, 책임 경계, Unreal 반영 지점을 먼저 확인할 수 있습니다.
-- `.cpp` 파일에는 실제 흐름과 예외 처리, 네트워크 또는 Editor 전용 분기가 있습니다.
-- `JsonAssetSync`, `GameplayValidator`는 원본에서 Unreal Plugin으로 구성했습니다.
-- `DataEditor`는 별도 .NET 8 WPF 데스크톱 도구입니다.
-- `Weapon`에는 무기 BP와 AnimBP에서 사용하는 C++ 보조 코드와 테스트를 모았고, `Weapon/Editor`에는 Custom AnimGraph 노드와 BP 연결 도구를 분리했습니다.
-- `Blueprints/Weapon`과 `Blueprints/WeaponAimAnimation`에는 구현 노드 검토용 `.uasset` 파일을 기능별로 모았습니다. 각 폴더 바로 아래에서 파일을 확인할 수 있습니다.
-- `.uasset`은 바이너리이므로 GitHub 웹에서는 노드 그래프를 직접 볼 수 없습니다. 노드 검토에는 원본 프로젝트와 의존성을 갖춘 Unreal Editor 5.6.1 환경이 필요합니다.
-
-## Blueprint Implementations
-
-직접 기능을 구현한 Blueprint 위주로 14개를 선별했습니다. 기존 GameMode, 캐릭터, UI 등에 기능 호출 노드나 컴포넌트만 연결한 BP는 포함하지 않았습니다. 초기 프로토타입, 테스트/디버그 BP, 인터페이스와 데이터 클래스도 제외했습니다.
-
-| 구분 | 파일 수 | 확인할 내용 |
+| 영역 | 코드 | 확인할 내용 |
 | --- | --- | --- |
-| 무기 공통/개별 BP | 7 | `BP_WeaponBase`와 MachineGun, Pistol, PlasmaGun, RailGun, RocketLauncher, ShotGun의 발사 처리 |
-| 투사체 발사 컴포넌트 | 1 | `BPC_ProjectileFire`의 투사체 생성과 발사 흐름 |
-| 투사체 BP | 4 | `BP_ProjectileBase`, `BP_PistolProjectile`, `BP_PlasmaProjectile`, `BP_RocketLauncherProjectile`의 공통 처리와 충돌, 폭발, 효과/사운드 연동 |
-| 무기 조준 AnimBP | 2 | 플라즈마건과 로켓런처의 조준 방향, 무기 자세 보정 |
+| 무기와 투사체 | [Weapon](./Weapon) | 조준 방향 보정, 투사체 경로 수렴, 플레이어와 환경의 충돌 분리, 1인칭 렌더링 |
+| 무기 Blueprint | [Weapon Blueprint](./Blueprints/Weapon) | 공통 발사 흐름, 무기별 발사 처리, 투사체 생성, 피해와 폭발 연출 연결 |
+| 조준 애니메이션 | [Weapon Aim Animation](./Blueprints/WeaponAimAnimation) | 플라즈마건과 로켓런처의 조준 방향에 맞춘 무기 자세 보정 |
+| AI 경로 탐색 | [PathLink](./PathLink) | 포탈, 점프패드, 점프, 낙하를 포함하는 경로와 Dijkstra 탐색 |
+| 포탈 | [Portal](./Teleport) | 서버 권한 이동, 재진입 방지, 플레이어별 출구 화면과 캡처 비용 조절 |
+| 외부 데이터 동기화 | [JsonAssetSync](./JsonAssetSync) | Reflection 기반 데이터 명세 생성, JSON 적용과 에셋 저장 분리 |
+| 데이터 편집 도구 | [DataEditor](./DataEditor) | Unreal Editor 없이 테이블, 에셋, 커브를 편집하는 .NET 8 WPF 도구 |
+| 레벨 검증 도구 | [GameplayValidator](./GameplayValidator) | 포탈, 점프패드, 특수 이동 연결의 배치 오류 검사 |
 
-### Weapon Blueprint
+## 주요 문제 해결
 
-- [BP_WeaponBase](./Blueprints/Weapon/BP_WeaponBase.uasset)에서 `TryFire`, `StartFire` 등의 공통 발사 흐름과 효과 처리를 확인할 수 있습니다.
-- 무기별 BP에는 각 무기에 맞는 발사 처리를 분리했습니다. 투사체를 사용하는 무기는 [BPC_ProjectileFire](./Blueprints/Weapon/BPC_ProjectileFire.uasset)와 투사체 BP를 함께 확인하면 됩니다.
-- 투사체 BP에는 생성 이후의 충돌 처리와 폭발, 히트 효과, 사운드 관련 노드가 포함되어 있습니다.
-- 최신 Plasma, RocketLauncher 투사체는 `ProjectileWorldCollisionComponent`의 `OnResolvedImpact`로 기존 충돌 그래프와 연결됩니다. `BP_WeaponBase`의 서버 충돌 알림에서는 같은 발사 ID의 클라이언트 시각용 투사체를 정리합니다. C++ 구현은 [Weapon 폴더](./Weapon)에서 함께 확인할 수 있습니다.
+### 조준점과 실제 투사체 방향 맞추기
 
-[무기 Blueprint 12개 보기](./Blueprints/Weapon)
+카메라와 총구 위치가 달라 근거리에서 조준점과 투사체 방향이 어긋나는 문제를 처리했습니다. 총구에서 조준선의 합류 지점까지 이동한 뒤 전방 비행으로 전환하며, 한 프레임 안에 합류 지점을 지나면 이동 시간을 나눠 계산합니다. 이동 중 충돌로 정지하거나 소멸하면 후속 이동을 중단합니다.
 
-### Weapon Aim Animation
+[투사체 이동 코드](./Weapon/ProjectileConvergenceComponent.cpp) / [조준 좌표와 안전한 발사 위치](./Weapon/WeaponProjectileAimLibrary.cpp)
 
-- [Steel_ABP_TP_BGH_PlasmaGun_AimAligned](./Blueprints/WeaponAimAnimation/Steel_ABP_TP_BGH_PlasmaGun_AimAligned.uasset)
-- [Steel_ABP_TP_BGH_RocketLauncher_AimAligned](./Blueprints/WeaponAimAnimation/Steel_ABP_TP_BGH_RocketLauncher_AimAligned.uasset)
+### 벽 뒤의 적이 투사체에 맞는 문제 해결
 
-플라즈마건과 로켓런처의 조준 방향에 맞춰 무기 자세를 보정하는 AnimBP입니다. AnimGraph와 조준 관련 갱신 흐름을 확인할 수 있습니다.
+플레이어 명중 검사와 환경 충돌 검사의 반경을 분리하고, 투사체가 실제로 지나간 구간에서 먼저 닿은 충돌을 선택합니다. 명중 검사 범위가 얇은 벽 뒤의 적까지 닿는 경우에는 추가 Line Trace로 가려진 대상을 제외합니다. 피해 판정은 서버가 맡으며, 서버 충돌 알림으로 같은 무기와 발사 ID의 시각용 투사체만 제거합니다.
 
-줌 BP는 이번 열람 대상에서 제외했고, 현재 사용하지 않는 플레이어 텔레포트 스킬 BP도 포함하지 않았습니다. 아래 `Teleport` 폴더의 레벨 Portal 시스템과는 별개입니다.
+[충돌 판정 코드](./Weapon/ProjectileWorldCollisionComponent.cpp) / [Blueprint 연결 도구](./Weapon/Editor)
 
-Blueprint 파일은 열람하기 쉽도록 원본의 중간 폴더를 생략해 모았습니다. 머티리얼, 메시, 사운드, DataAsset 인스턴스 등의 의존성은 포함하지 않았으며, 그대로 다른 프로젝트의 Content 폴더에 복사해 실행하는 패키지가 아닙니다.
+### AI 특수 이동과 반복 계산 줄이기
 
-## Weapon C++ Systems
+NavMesh의 일반 이동에 포탈, 점프패드, 점프, 낙하 연결을 추가하고 이동 비용을 함께 비교합니다. 특수 이동 지점 사이의 거리와 연결 정보를 정적 그래프에 캐시하며, 요청별 출발점과 도착점 후보를 검증한 뒤 최종 선택한 일반 이동 구간만 상세 경로 좌표를 생성합니다.
 
-무기 Blueprint와 조준 AnimBP의 동작을 보조하는 C++ 시스템입니다.
+[경로 탐색 코드](./PathLink/PathLinkRouteFinder.cpp) / [그래프 캐시 관리](./PathLink/PathLinkSubsystem.cpp)
 
-- `WeaponAimAlignmentComponent`, `AnimNode_WeaponAimAlignment`와 수학 유틸리티가 무기 조준 정렬과 AnimGraph 처리를 담당합니다.
-- `WeaponProjectileAimLibrary`가 카메라 조준점과 총구 위치를 기준으로 발사 좌표를 구하고, 총구가 벽에 막혔을 때의 안전한 시작 위치를 처리합니다. 서버가 정한 비행 목표를 공유하고, 클라이언트 시각용 투사체의 시작 위치는 로컬 FP/TP 총구에 맞춥니다.
-- `ProjectileConvergenceComponent`는 총구에서 합류점까지의 이동과 이후 전방 비행을 분리합니다. 한 프레임에 합류점을 통과할 때에도 이동 구간을 나눠 처리합니다.
-- `ProjectileFirstPersonRenderingComponent`는 로컬 플레이어의 팔, 무기, 총구 효과에 1인칭 렌더링을 적용합니다. 무기 Bounds와 캐릭터 Capsule의 여유 공간, FOV 보정에 맞춰 렌더 스케일을 줄이고, 로컬 활성 시점의 Near Clip을 조정합니다. 무기 교체, 비활성화, 종료 시 기존 상태를 복구합니다.
-- `ProjectileWorldCollisionComponent`는 기존 Root Sphere의 플레이어 판정 반경과 별도 환경 판정 반경을 사용합니다. 실제 이동 구간을 Sweep하고 먼저 닿은 벽 또는 플레이어를 선택하며, 큰 플레이어 판정 반경으로 인한 벽 너머 피해를 추가 가시성 검사로 차단합니다.
-- `OnResolvedImpact`가 기존 BP의 충돌, 피해, 폭발 그래프를 호출합니다. `DestroyProjectileVisualsById`는 서버 충돌 알림에 대응해 같은 무기와 발사 ID의 비피해 시각용 복사본만 정리합니다.
-- 초기 무기 지급은 `InitialWeaponLoadoutComponent`와 DataAsset으로 분리했고, `WeaponPresentationLibrary`, `ProjectileMuzzleFlashLibrary`, `WeaponBeamEffectLibrary`는 무기별 메시와 효과 연결을 보조합니다.
-- `Weapon/Editor`에는 Custom AnimGraph 노드와 기존 BP에 조준, 총구 효과, 충돌 컴포넌트 및 이벤트를 연결하는 Editor 전용 도구를 포함했습니다. 런타임 모듈과 분리해 읽어야 합니다.
-- `FirstPersonRenderingTests.cpp`, `ProjectileConvergenceTests.cpp`, `ProjectileSplitCollisionTests.cpp`, `WeaponProjectileAimTests.cpp`를 함께 수록했습니다. 테스트 실행에는 원본 프로젝트 환경이 필요합니다.
+### 외부 데이터 편집과 안전한 반영
 
-[Weapon C++ 코드 보기](./Weapon)
+Unreal Reflection에서 타입, 입력 범위, Enum과 중첩 구조를 추출해 데이터 명세를 생성하고 WPF 편집기가 이를 읽습니다. 저장 전에 입력값을 검증하며, Runtime의 메모리 적용과 Editor의 에셋 저장을 분리합니다. 동기화 대상 에셋을 Editor에서 저장하면 연결된 JSON에도 현재 값을 기록합니다.
 
-## External Data Pipeline
+[데이터 명세 생성](./JsonAssetSync/JsonAssetSyncSchemaExporter.cpp) / [JSON 적용 서비스](./JsonAssetSync/JsonApplyService.cpp) / [WPF 편집기](./DataEditor)
 
-### JsonAssetSync
+## 추가 구현
 
-외부 JSON을 게임 데이터에 반영하는 Unreal Plugin입니다.
+| 시스템 | 코드 | 확인할 내용 |
+| --- | --- | --- |
+| 스폰과 리스폰 | [SpawnSelectionSystem](./SpawnSelectionSystem) | 플레이어와 AI의 스폰 지점 선택, 생성 실패 시 배정 복구, 사망 위치에서 먼 후보 선택 |
+| 사망 카메라 | [DeathCam](./DeathCam) | 사망한 플레이어의 카메라 전환, 지형 충돌 보정, 킬러 하이라이트 |
+| 캐릭터 표시 | [CharacterDisplay](./CharacterDisplay) | 카메라별 외곽선, 조준 대상 닉네임, PlayerState 기반 복수 대상 표시 |
+| 캐릭터 외형 | [CharacterAppearance](./CharacterAppearance) | DataTable 기반 메시 선택, 외형 복제와 사망 파츠 처리 |
+| 사망 아이템 드롭 | [DeathDrop](./DeathDrop) | 드롭 후보 선택, 물리 발사, 착지 위치 복제와 버프 종료 시각 보존 |
+| 로딩 | [Loading](./Loading) | 서버 준비와 실제 참가자 대기, 로딩 화면과 입력 잠금, BGM 시작 연동 |
+| 배경 음악 | [Audio](./Audio) | 상태별 곡 선택, 비동기 로드, Fade 전환과 Pause 중 반복 재생 |
 
-- Runtime에서는 메모리 적용만 수행하고, Editor에서는 Apply 및 에셋 저장을 분리합니다.
-- `FJsonAssetSyncSchemaExporter`가 Registry와 Unreal Reflection을 읽어 `JsonAssetSyncManifest.json`을 생성합니다.
-- Manifest에는 필드명, 표시명, C++ 타입, Category, 범위 제약, Enum 선택지, 중첩 Struct 정보가 포함됩니다.
-- 동기화 대상 에셋을 Editor에서 저장하면 연결된 외부 JSON에도 현재 값을 기록합니다.
-- 최신 Manifest에는 캐릭터 모델링 ID와 캐릭터, AI 성격 필드의 설명 및 표시 순서를 반영했습니다.
-- Blueprint 필드의 Category는 Reflection에서 얻은 표시명을 유지하며, 현재 Manifest의 Bool, String, Int, Float 항목에는 `디폴트`를 사용합니다.
-- 지원 대상은 DataTable, DataAsset, CurveTable, FloatCurve입니다.
+## 코드 열람 안내
 
-[JsonAssetSync 코드 보기](./JsonAssetSync)
+- 각 시스템의 `.h`에서 데이터 구조와 책임을, `.cpp`에서 실제 처리와 예외 대응을 확인할 수 있습니다. 원본의 Public/Private 구조는 열람하기 쉽도록 기능별로 모았습니다.
+- `Weapon/Editor`는 Blueprint 연결과 Custom AnimGraph 노드를 위한 Editor 전용 코드입니다. `JsonAssetSync`와 `GameplayValidator`는 Unreal 플러그인, `DataEditor`는 별도 WPF 도구입니다.
+- Blueprint는 무기 공통/개별 BP 7개, 발사 컴포넌트 1개, 투사체 BP 4개, 조준 AnimBP 2개로 총 14개입니다. 직접 구현한 기능 위주로 선별했습니다.
+- `.uasset`의 노드 그래프는 GitHub 웹에서 볼 수 없습니다. 원본 프로젝트와 의존성을 갖춘 Unreal Editor 5.6.1 환경에서 열람해야 합니다.
 
-### DataEditor
+## 테스트 코드와 기준 버전
 
-Unreal Editor를 실행하지 않고 프로젝트 데이터를 조회, 수정하기 위한 .NET 8 WPF 도구입니다.
+Unreal Automation 테스트 코드를 함께 수록했습니다. 대표 확인 항목은 다음과 같습니다.
 
-- Manifest와 프로젝트 정보를 읽어 편집 가능한 데이터 대상을 구성합니다.
-- DataTable, DataAsset, CurveTable, FloatCurve와 JSON/CSV 흐름을 지원합니다.
-- 단일 실행 파일 배포를 고려해 프로젝트 루트와 상대 경로를 검증합니다.
+- [투사체 수렴](./Weapon/ProjectileConvergenceTests.cpp): 한 프레임 안의 합류 지점 통과, 남은 시간의 이동과 충돌 정지
+- [충돌 분리](./Weapon/ProjectileSplitCollisionTests.cpp): 벽과 플레이어의 충돌 순서, 얇은 벽 뒤 명중 차단, 이동 구간과 컴포넌트 생명주기
+- [1인칭 렌더링](./Weapon/FirstPersonRenderingTests.cpp): 캐릭터 충돌 영역 안의 스케일 계산, FOV와 Near Clip 입력 안전성
+- [닉네임 보조 검색](./CharacterDisplay/ShooterNicknameSphereTests.cpp): 정확한 조준 대상 우선, 보조 검색 설정, 벽 가림과 잘못된 입력
 
-[DataEditor 코드 보기](./DataEditor)
-
-## Level Validation Tool
-
-플레이 테스트 전에 레벨 배치 오류를 검사하는 Unreal Editor Plugin입니다.
-
-- Portal, JumpPad, PathLink를 Provider로 분리해 검사 대상을 확장합니다.
-- World Scanner가 Actor를 수집하고, Provider Registry가 검사 로직을 연결합니다.
-- Portal은 활성 상태일 때 `Exit Target` 누락, 자기 자신 연결을 검사하고, 공용 Teleport DA의 Launch Angle, Power가 유효한지도 확인합니다.
-- JumpPad는 ApexTime / LaunchAngle 유형을 별도 슬롯으로 관리하며, 각 유형의 TargetPoint 누락, 자기 자신 연결, 동일 위치를 보고합니다.
-- Reflection 유틸리티로 Blueprint 구현에 직접 의존하지 않고 bool, 숫자, Actor 속성을 읽어 검사합니다.
-
-[GameplayValidator 코드 보기](./GameplayValidator)
-
-## AI Navigation Assist
-
-NavMesh만으로 해결하기 어려운 특수 이동 구간을 AI 경로에 포함하는 시스템입니다.
-
-- `APathLink`가 레벨의 Link Actor 역할을 맡습니다.
-- `PathLinkSubsystem`이 등록, Endpoint 검증, Static Graph 생성을 담당합니다.
-- `PathLinkRouteFinder`가 Dijkstra로 Shortest Route를 계산합니다.
-- Portal, JumpPad, Jump, Drop을 동일한 경로 탐색 흐름으로 처리합니다.
-
-[PathLink 코드 보기](./PathLink)
-
-## Spawn / Respawn
-
-Player와 AI가 공통으로 사용하는 스폰 선택 시스템입니다.
-
-- 서버 BeginPlay에서 레벨의 SpawnPoint와 `Spawn_Type`을 자동 등록합니다.
-- `Both`, `PlayerOnly`, `BotOnly`로 후보를 구분하고, Controller에 맞는 전용 포인트를 공용 포인트보다 우선합니다.
-- 최초 스폰에서는 배정 수를 기준으로 분산하고, Pawn 생성, Possess 실패 시 배정을 복구합니다.
-- 리스폰에서는 선택된 타입의 포인트를 사망 위치에서 먼 순서로 정렬하고, 먼 절반에서 무작위로 선택합니다.
-- `CharacterSpawnSoundComponent`가 최초 스폰, 리스폰별 사운드의 지연, 볼륨, 2D/3D 공간, 재생 대상을 제어합니다.
-- SpawnPoint 회전은 서버 Controller와 Owning Client에 함께 반영합니다.
-
-[Spawn / Respawn 코드 보기](./SpawnSelectionSystem)
-
-## DeathCam
-
-사망한 Owning Client에만 Killer를 보여주는 카메라 시스템입니다.
-
-- `DeathCamComponent`가 ViewTarget 생명주기와 Owning Client 처리를 담당합니다.
-- `DeathCamActor`가 Sweep, Collision Slide, 카메라 위치 보정을 처리합니다.
-- Killer가 가려진 경우 Outline/Fill 방식의 Highlight를 적용합니다.
-
-[DeathCam 코드 보기](./DeathCam)
-
-## Portal
-
-서버 권한으로 동작하는 단방향 Portal 시스템입니다.
-
-- `OneWayTeleportActor`가 Overlap, 출구 이동, Controller 회전 동기화, `ForceNetUpdate`를 처리합니다.
-- Portal A에서 B로 이동한 직후 발생할 수 있는 Overlap 재진입을 잠가 무한 왕복을 방지합니다.
-- `TeleportDataAsset`에서 Launch Angle, Power, Move Lock Time, 사운드 설정을 조정합니다.
-- 실제 Portal을 이용한 클라이언트에서만 사운드를 재생합니다.
-- `PortalViewSubsystem`이 로컬 카메라를 출구 시점으로 변환해 클라이언트별 SceneCapture와 Render Target을 관리합니다.
-- 화면 점유율에 따른 동적 해상도, 단계별, 정지 상태 갱신 빈도, 프레임당 캡처 예산으로 렌더링 비용을 조절합니다.
-- Mesh 크기에 맞춘 Collision, 화면, Niagara 효과와 포탈별 VFX 색상, 투명도를 설정합니다.
-- Niagara 효과는 크기만 자동 조정하고, 편집한 컴포넌트 위치와 회전은 Construction 재실행과 BeginPlay에서도 유지합니다.
-
-[Portal 코드 보기](./Teleport)
-
-## Character Appearance
-
-캐릭터와 모델링 DataTable을 분리해 일반 메시와 사망 외형을 선택하는 시스템입니다.
-
-- `CharacterAppearanceComponent`가 Character Row에서 Modeling ID를 읽고, Modeling Row를 조회해 메시를 적용합니다.
-- `SetModelingRowName` / `SetModelingRowHandle`로 모델링 행을 직접 지정하고, 테이블, 행 유효성을 확인합니다. 기존 Modeling ID 조회도 유지합니다.
-- 스폰 시점에 일반 외형과 사망 외형을 동기화합니다.
-- 전용 사망 파츠가 있으면 해당 파츠만 교체하고, 없는 파츠는 기존 Ragdoll/Impulse 연출을 유지합니다.
-- 에디터 전용 슬롯 메타데이터를 분리해 패키징 빌드에서도 머티리얼 탐색을 안전하게 처리합니다.
-
-[Character Appearance 코드 보기](./CharacterAppearance)
-
-## Character Display
-
-로컬 플레이어에게 다른 캐릭터의 외곽선, 조준 대상 닉네임, 복수 대상을 표시하는 시스템입니다.
-
-- `ShooterOutlineComponent`가 원본 메시를 변경하지 않는 CustomDepth 전용 프록시를 만들고, 카메라별 SceneViewExtension으로 외곽선을 적용합니다.
-- 일반 대상과 복수 대상의 Stencil을 분리하고, DeathCam용 값 1은 유지합니다. OwnerOnly 표시, 숨김 파츠, 분할 화면의 카메라별 가시성을 반영하며 DeathCam 중에는 일반 표시를 중지합니다.
-- `ShooterNicknameComponent`가 실제 조준점에서 피해 판정용 충돌을 추적하고, 벽 너머나 숨겨진 캐릭터, 사망한 캐릭터를 표시 대상에서 제외합니다. 기존 장착 아이템의 판정 채널과 사거리는 읽기 전용으로 참조합니다.
-- 닉네임 판정은 정확한 Line Trace 대상을 우선합니다. 유효한 대상이 없을 때만 설정된 반경의 Sphere Trace로 주변 후보를 찾고, 원래 충돌 응답을 사용하는 별도 시야 검사로 벽 뒤 대상을 제외합니다. 실제 피해 판정 크기는 바꾸지 않으며 보조 검색은 끄거나 반경을 0으로 설정할 수 있습니다.
-- `ShooterNicknameWidget`이 기존 HUD를 변경하지 않는 별도 Overlay로 닉네임을 그립니다. 글꼴, 외곽선, 색상, DPI 보정 위치와 조준 이탈 후 유지 시간을 설정할 수 있습니다.
-- `bShowAboveCrosshair`로 닉네임을 조준점 위/아래에 배치합니다. 유효하지 않은 Viewport, 0 크기 화면, 역변환할 수 없는 Render Transform은 좌표 변환 전에 걸러냅니다.
-- `ShooterRevengeComponent`가 기존 PlayerState의 `RevengeTarget`을 서버에서 읽고 Owning Client에만 복제합니다. Pawn이 리스폰해도 같은 PlayerState를 기준으로 복수 대상을 식별하며, 기존 킬과 사망 규칙은 변경하지 않습니다.
-- `ShooterDisplayLibrary`가 기존 Blueprint의 생존 상태와 표시 이름을 읽으며, 런타임 스타일은 Settings DataAsset에 덮어쓰지 않습니다.
-- 원본 `AMyPlayerController` 생성자에서 Outline, Nickname, Revenge 컴포넌트를 연결합니다. 렌더링에는 `r.CustomDepth=3`, Post Process 머티리얼, Settings DataAsset과 `UMG`, `Slate`, `SlateCore`, `RHI`, `RenderCore` 모듈이 필요하며 에셋과 전체 Controller는 이 발췌본에 포함하지 않았습니다.
-- `CharacterDisplayTests.cpp`, `RevengePlayerStateBridgeTests.cpp`에 충돌 판정, 가시성, 프록시 정리, 복수 대상 동기화 관련 Unreal Automation 테스트가 포함됩니다. 테스트 실행에는 원본 프로젝트와 에셋이 필요합니다.
-- `ShooterNicknameSphereTests.cpp`에는 정확한 조준 대상 우선, 보조 검색 ON/OFF, 벽 가림, 초기 Overlap, 거리 제한과 잘못된 입력 관련 회귀 테스트가 포함됩니다.
-
-[Character Display 코드 보기](./CharacterDisplay)
-
-## BGM
-
-레벨 전환을 넘어 유지되는 클라이언트 전용 배경 음악 시스템입니다.
-
-- `BGMSubsystem`이 메인 메뉴, 로비, 게임플레이, 결과 상태와 맵별 트랙을 선택하고 Fade로 전환합니다.
-- Soft Reference 비동기 로드에 요청 ID를 사용해 오래된 요청이 최신 재생 상태를 덮어쓰지 않도록 합니다.
-- `BGMPlayback`이 원본 SoundWave/SoundCue를 변경하지 않고 임시 Cue로 오디오 스레드 반복 재생을 구성해 Pause 중에도 반복을 유지합니다.
-- MetaSound 등 절차형 사운드는 자체 그래프의 Loop 설정이 필요합니다.
-- 게임플레이 맵 전환 시 기존 곡을 종료하고, LoadingCoordinator의 준비 완료 신호에서 게임 BGM을 시작합니다.
-- `BGMPlaybackTests.cpp`에는 반복 재생과 원본 에셋 보존 관련 Unreal Automation 테스트가 포함됩니다.
-
-[BGM 코드 보기](./Audio)
-
-## Loading
-
-서버의 준비 상태와 클라이언트의 맵 전환 화면을 연결하는 로딩 시스템입니다.
-
-- `LoadingCoordinatorWorldSubsystem`이 서버 월드에 Coordinator를 자동 생성합니다.
-- `LoadingCoordinator`가 서버 초기화와 예상 실제 참가자 수를 확인해 준비 단계를 복제합니다.
-- `LoadingScreenSubsystem`이 Slate 화면을 표시하고 입력을 잠근 뒤 준비 상태에 따라 해제합니다.
-- `LoadingBlueprintLibrary`가 로딩 화면 표시 후 맵 열기, 메인 메뉴 복귀 등의 Blueprint 진입점을 제공합니다.
-- `EndLoadingScreen`에서 `EndExternalLoading`을 호출해 서버 대기 실패나 타임아웃 시 외부 로딩 화면과 입력 잠금을 명시적으로 해제할 수 있습니다.
-- 메인 메뉴 복귀 시 로컬 서버 종료는 원본 GameInstance의 `HandlePreLoadMap`에서 처리합니다. 화면 표시 콜백에서 종료하지 않아 새로 생성된 서버를 잘못 중지하는 상황을 피합니다.
-- GameMode의 `MarkServerWorldReady` 호출과 `ExpectedHumanPlayers` URL 옵션으로 준비 조건을 연결하며, 기존 흐름을 위한 fallback도 포함합니다.
-
-[Loading 코드 보기](./Loading)
-
-## Death Drop
-
-서버에서 사망 시점의 아이템 후보를 수집하고 물리 드롭을 생성하는 시스템입니다.
-
-- `DeathDropSubsystem`이 체력 변경 직전 호출되어 중복 처리를 막고, 설정된 최대 개수만큼 후보를 중복 없이 무작위로 선택합니다.
-- `DeathDropCarrier`가 방사 방향 발사, 수평 감속, 착지, 픽업 연결과 상태 복제를 담당합니다.
-- 바닥 접촉점과 법선, 물리 구체 반경으로 착지 중심을 다시 계산하고, `SettlementHeightOffset`만큼 월드 위쪽으로 띄워 드롭이 바닥에 묻히는 현상을 줄입니다. 서버의 `SettledLocation`을 복제해 클라이언트도 같은 위치에서 물리를 정지합니다.
-- 활성 버프는 기존 서버 종료 시각을 유지하며, 미획득 드롭은 설정된 시간 후 제거합니다.
-- `DeathDropSettings`에서 후보 종류, 발사 범위, 감속, 수명, 픽업 데이터를 조정합니다.
-- 원본의 초기 로드아웃, 픽업 Blueprint에 의존하는 발췌 코드입니다.
-
-[Death Drop 코드 보기](./DeathDrop)
+코드 동기화 기준은 2026-10-14의 [BattleArena main 7c0bf94c0](https://github.com/Qusbell/BattleArena/commit/7c0bf94c0f8dee011e1e1d5252d410502c1aaf3d)입니다. 해당 동기화에서 빌드, 테스트 실행과 실제 플레이 검증은 수행하지 않았으며, 테스트 실행에는 원본 프로젝트 환경이 필요합니다.
