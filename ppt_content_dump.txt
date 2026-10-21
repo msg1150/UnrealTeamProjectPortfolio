@@ -1,0 +1,76 @@
+=== SLIDE 1 ===
+[TextBox 4 (id=5)] 2026 GAME CLIENT DEVELOPER
+[TextBox 5 (id=6)] 포트폴리오 샘플
+[TextBox 6 (id=7)] C++ & Unreal Engine 5
+3D 액션 RPG 클라이언트 개발자
+[TextBox 7 (id=8)] 전투 시스템 설계, 애니메이션 동기화 및 렌더링 성능 최적화 중심 기술 명세서
+[TextBox 8 (id=9)] 개발 기간
+[TextBox 9 (id=10)] 2025.10 ~ 2026.02 (4개월)
+[TextBox 10 (id=11)] 주요 기술 스택
+[TextBox 11 (id=12)] C++20, UE 5.4, Git
+[TextBox 12 (id=13)] 핵심 링크
+[TextBox 13 (id=14)] GitHub / YouTube 시연
+=== SLIDE 2 ===
+[TextBox 10 (id=11)] PROJECT OVERVIEW
+[TextBox 11 (id=12)] 프로젝트 개요 및 시스템 구조
+[TextBox 12 (id=13)] 프로젝트 스펙
+[TextBox 13 (id=14)] 메인 클래스 의존성 구조
+[TextBox 14 (id=15)] 장르: 3D 쿼터뷰 액션 RPG
+[TextBox 15 (id=16)] 담당 인원: 4인 팀 (메인 클라이언트 1인)
+[TextBox 16 (id=17)] 담당 역할: 전투 모듈, FSM, 몬스터 AI, 최적화
+[TextBox 17 (id=18)] 설계 목표: 모듈 간 의존성을 낮춘 컴포넌트 구조
+[TextBox 18 (id=19)] ACharacterBase (기본 캐릭터)
+[TextBox 19 (id=20)] 공통 이동 및 스탯 처리 로직 관장
+[TextBox 20 (id=21)] AMonsterBase : ACharacterBase
+[TextBox 21 (id=22)] BehaviorTree 기반 AI 제어 및 오브젝트 풀링 수신
+[TextBox 22 (id=23)] UCombatComponent
+[TextBox 23 (id=24)] 전투 판정 및 콤보 스킬
+[TextBox 24 (id=25)] UStateComponent
+[TextBox 25 (id=26)] FSM 기반 상태 전이
+=== SLIDE 3 ===
+[TextBox 4 (id=5)] CORE IMPLEMENTATION I
+[TextBox 5 (id=6)] FSM 전투 시스템 및 AnimNotify 동기화
+[TextBox 6 (id=7)] void UANS_AttackHitCheck::NotifyTick( USkeletalMeshComponent* Mesh, UAnimSequenceBase* Anim, float FrameDeltaTime) { Super::NotifyTick(Mesh, Anim, FrameDeltaTime); if (ACharacterBase* Attacker = Cast(Mesh->GetOwner())) { // 애니메이션 프레임에 맞춰 충돌 검사 실행 Attacker->GetCombatComponent() ->CheckHitMultiTrace(); } }
+[TextBox 7 (id=8)] ANS_AttackHitCheck.cpp
+[TextBox 8 (id=9)] void UANS_AttackHitCheck::NotifyTick( USkeletalMeshComponent* Mesh, UAnimSequenceBase* Anim, float FrameDeltaTime) { Super::NotifyTick(Mesh, Anim, FrameDeltaTime); if (ACharacterBase* Attacker = Cast(Mesh->GetOwner())) { // 애니메이션 프레임에 맞춰 충돌 검사 실행 Attacker->GetCombatComponent() ->CheckHitMultiTrace(); } }
+[TextBox 9 (id=10)] 구현 목표
+[TextBox 10 (id=11)] 애니메이션 프레임과 충돌 판정 시점의 정밀한 동기화
+[TextBox 11 (id=12)] 핵심 기법
+[TextBox 12 (id=13)] UAnimNotifyState 상속을 통한 프레임 단위 Multi-Trace 검사
+=== SLIDE 4 ===
+[TextBox 10 (id=11)] CORE IMPLEMENTATION II
+[TextBox 11 (id=12)] 정밀 히트박스 모듈화 설계
+[TextBox 12 (id=13)] SphereTrace 검사
+[TextBox 13 (id=14)] 무기 궤적 연산으로 공중 타격 판정 정밀도 향상.
+[TextBox 14 (id=15)] 중복 피격 방지
+[TextBox 15 (id=16)] TArray 목록 관리로 동일 프레임 다중 타격 차단.
+[TextBox 16 (id=17)] 이벤트 디스패처
+[TextBox 17 (id=18)] 데미지 전단 로직 분리로 컴포넌트 결합도 감소.
+=== SLIDE 5 ===
+[Table 12 TABLE]
+구분 | 문제 상황 (Before) | 원인 및 해결책 (Action)
+현상 | 몬스터 100마리 스폰 시 18 FPS 저하 | 개별 StaticMesh 렌더링으로 Draw Call 급증
+적용 기술 | Static Mesh Actor 개별 생성 | Hierarchical Instanced Static Mesh (HISM) 전환
+[TextBox 13 (id=14)] OPTIMIZATION & TROUBLESHOOTING
+[TextBox 14 (id=15)] Draw Call 병목 해결 및 프레임 방어
+[TextBox 15 (id=16)] Draw Call 수치
+[TextBox 16 (id=17)] 1,240 → 320
+[TextBox 17 (id=18)] 74.1% 감소
+[TextBox 18 (id=19)] 평균 프레임 (FPS)
+[TextBox 19 (id=20)] 18 → 60 FPS
+[TextBox 20 (id=21)] 222% 성능 향상
+=== SLIDE 6 ===
+[TextBox 3 (id=4)] PROFILING & MEMORY
+[TextBox 4 (id=5)] Unreal Insights 프로파일링 및 메모리 재사용
+[TextBox 5 (id=6)] 오브젝트 풀링 (Object Pooling)
+[TextBox 6 (id=7)] 투사체 및 이펙트 생성 시 GC(Garbage Collection) 스파이크 방지.
+ 사전 할당 메모리 큐 활용으로 프레임 드랍 원인 차단.
+[TextBox 7 (id=8)] Unreal Insights 분석
+[TextBox 8 (id=9)] CPU 타임라인 병목 영역 추적 및 Tick 수 감소.
+ 불필요한 Distance 연산 스케줄링 간격 조정 완료.
+=== SLIDE 7 ===
+[TextBox 5 (id=6)] THANK YOU
+[TextBox 6 (id=7)] 경청해 주셔서 감사합니다
+[TextBox 7 (id=8)] 질의응답 및 상세 코드 검토는 아래 채널에서 확인하실 수 있습니다.
+[TextBox 8 (id=9)] github.com/developer-sample
+[TextBox 9 (id=10)] velog.io/@gamedev-sample
