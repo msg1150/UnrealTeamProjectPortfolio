@@ -1,0 +1,17 @@
+{
+  "source_repository": "Qusbell/BattleArena",
+  "ownership_branch_pattern": "PJH",
+  "scope": "Personal implementation excerpts, not the full team project",
+  "frozen_paths": [
+    {
+      "path": "PathLink/",
+      "portfolio_baseline_commit": "2d5b0c733c93af8702e434e984767b7501b3d082",
+      "rule": "Keep every file unchanged. Do not import later team changes without explicit user approval."
+    }
+  ],
+  "frozen_notion_pages": ["3cea186e-6315-8043-bed8-c1bc5d9c8f1d"],
+  "ownership_rule": "Review the first-parent diff of each merged PJH pull request. Do not treat unrelated commits inherited from main as personal work.",
+  "excluded_assets": ["Materials", "Meshes", "Sounds", "DataAsset instances", "Zoom BP", "Unused player teleport skill BP"],
+  "unrelated_team_changes": "Do not sync ranking HUD, shared display names, server transitions, buffs, jump pads or JSON Manifest unless their changes are explicitly approved or verified as PJH work.",
+  "legacy_portal_rule": "Retain OneWayTeleportActor, PortalViewSubsystem and TeleportDataAsset while SeamlessPortalActor inherits or references them."
+}
