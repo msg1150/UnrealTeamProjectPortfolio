@@ -1,9 +1,17 @@
 {
   "updated": "2026-11-02",
   "source_repository": "Qusbell/BattleArena",
-  "main_reviewed": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+  "main_reviewed": "2c25acc374ce2947d99a4ce841ef88438ac9ef41",
   "selection": "Merged PJH PRs only; selected files use current main contents",
+  "incremental_update": {
+    "scope": "DropItem despawn shrink implementation and settings example",
+    "excluded": "Binary DataTable asset and unrelated Manifest regeneration changes"
+  },
   "personal_pull_requests": [
+    {
+      "Revision": "2c25acc374ce2947d99a4ce841ef88438ac9ef41",
+      "Subject": "Merge pull request #891 from Qusbell/PJH_20261102_DropItem"
+    },
     {
       "Revision": "0468683174bc51857bf9fc0d4fa186ae4ec88275",
       "Subject": "Merge pull request #793 from Qusbell/PJH_20261021_Portal"
@@ -522,8 +530,8 @@
     {
       "source": "Source/ShootingArena/Private/Items/DeathDropCarrier.cpp",
       "target": "DeathDrop/DeathDropCarrier.cpp",
-      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
-      "personal_revision": "b247e86622033b8acfe4576a466f7ca096e9da4a",
+      "main_revision": "2c25acc374ce2947d99a4ce841ef88438ac9ef41",
+      "personal_revision": "98a26aac529421dc9f714e1545d30555456c6246",
       "status": "M"
     },
     {
@@ -917,6 +925,26 @@
       "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
       "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
       "status": "A"
+    }
+  ],
+  "additional_files": [
+    {
+      "source": "Source/ShootingArena/Public/Items/DeathDropCarrier.h",
+      "target": "DeathDrop/DeathDropCarrier.h",
+      "main_revision": "2c25acc374ce2947d99a4ce841ef88438ac9ef41",
+      "personal_revision": "98a26aac529421dc9f714e1545d30555456c6246"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Items/DeathDropSettings.h",
+      "target": "DeathDrop/DeathDropSettings.h",
+      "main_revision": "2c25acc374ce2947d99a4ce841ef88438ac9ef41",
+      "personal_revision": "98a26aac529421dc9f714e1545d30555456c6246"
+    },
+    {
+      "source": "Content/DataTables/DT_DropItemSetting.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_DropItemSetting.json",
+      "main_revision": "2c25acc374ce2947d99a4ce841ef88438ac9ef41",
+      "personal_revision": "98a26aac529421dc9f714e1545d30555456c6246"
     }
   ],
   "curation": {

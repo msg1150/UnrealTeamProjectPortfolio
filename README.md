@@ -59,6 +59,14 @@ BattleArena 멀티플레이 슈팅 팀 프로젝트에서 직접 구현한 게�
 
 [충돌 판정 코드](./Weapon/ProjectileWorldCollisionComponent.cpp) / [Blueprint 연결 도구](./Weapon/Editor)
 
+### 사망 드롭의 소멸 전 축소
+
+미획득 드롭은 수명이 끝나기 직전에 메시가 서서히 작아집니다. `DespawnShrinkEnabled`와 `DespawnShrinkDuration`으로 사용 여부와 시간을 설정하며, 예시 설정은 수명 3초 중 마지막 0.1초에 축소합니다. 축소 시작과 제거 시각을 서버 시간으로 복제해 늦게 표시된 클라이언트도 현재 진행률로 합류합니다.
+
+기존 BP의 회전/상하 애니메이션과 픽업 충돌은 유지하도록 메시 위에 임시 시각용 부모를 추가해 스케일을 조절합니다. 아이템을 획득하면 축소를 복구하며, 수명 만료로 제거될 때 원래 크기가 잠깐 다시 보이지 않게 처리합니다. 적용할 수 없는 메시에는 기존 즉시 제거 방식이 유지됩니다.
+
+[드롭 소멸 처리](./DeathDrop/DeathDropCarrier.cpp) / [드롭 설정](./DeathDrop/DeathDropSettings.h) / [설정 예시](./JsonAssetSync/Examples/DataTables/DT_DropItemSetting.json)
+
 ### AI 특수 이동과 반복 계산 줄이기
 
 NavMesh의 일반 이동에 포탈, 점프패드, 점프, 낙하 연결을 추가하고 이동 비용을 함께 비교합니다. 특수 이동 지점 사이의 거리와 연결 정보를 정적 그래프에 캐시하며, 요청별 출발점과 도착점 후보를 검증한 뒤 최종 선택한 일반 이동 구간만 상세 경로 좌표를 생성합니다.
@@ -81,7 +89,7 @@ Cook 전후의 프로퍼티 이름 차이는 Reflection 기반 정규화로 처�
 | 사망 카메라 | [DeathCam](./DeathCam) | 좁은 모서리의 사망 위치 시점, Sweep/Slide 충돌 보정, 킬러 하이라이트 |
 | 캐릭터 표시 | [CharacterDisplay](./CharacterDisplay) | 카메라별 외곽선, 조준 대상 닉네임, PlayerState 기반 복수 대상 표시 |
 | 캐릭터 외형 | [CharacterAppearance](./CharacterAppearance) | DataTable 기반 메시 선택, 외형 복제와 사망 파츠 처리 |
-| 사망 아이템 드롭 | [DeathDrop](./DeathDrop) | 드롭 후보 선택, 착지 위치/직립 회전 복제와 생명별 중복 처리 분리 |
+| 사망 아이템 드롭 | [DeathDrop](./DeathDrop) | 드롭 후보 선택, 착지 복제, 생명별 중복 처리 분리와 서버 시간 기반 소멸 전 축소 |
 | 로딩 | [Loading](./Loading) | 서버 준비와 실제 참가자 대기, 소유 GameInstance별 전환 처리와 BGM 볼륨 연동 |
 | 배경 음악 | [Audio](./Audio) | 메뉴/게임플레이 곡 선택, 로딩 중 감쇠와 복구, 같은 곡의 재생 위치 유지 |
 
@@ -109,6 +117,6 @@ Unreal Automation 테스트 코드를 함께 수록했습니다. 대표 확인 �
 
 ## 동기화 범위
 
-2026-11-02 기준 [BattleArena main 8572770d6](https://github.com/Qusbell/BattleArena/commit/8572770d64c6e367ec46a833a1dd0f81cc850510)에서 병합된 PJH 작업을 선별하고, 해당 파일은 현재 main 버전으로 반영했습니다. 별도 브랜치에만 남은 작업과 수정 중인 로컬 파일은 제외했습니다. 이번 갱신에서 빌드와 실행 검증은 수행하지 않았습니다.
+2026-11-02 기준 [BattleArena main 2c25acc37](https://github.com/Qusbell/BattleArena/commit/2c25acc374ce2947d99a4ce841ef88438ac9ef41)에서 병합된 PJH 작업을 선별하고, 해당 파일은 현재 main 버전으로 반영했습니다. DropItem의 소멸 전 축소와 JSON 설정 예시도 포함합니다. 별도 브랜치에만 남은 작업과 수정 중인 로컬 파일은 제외했습니다. 이번 갱신에서 빌드와 실행 검증은 수행하지 않았습니다.
 
 `PathLink/`는 기존 개인 구현 버전으로 고정했습니다. 외곽선과 닉네임의 `CharacterDisplay/` 및 관련 설정/Manifest 항목도 이번 갱신에서 보류했습니다. [동기화 정책](./portfolio-sync-policy.json)을 따르며, 머티리얼, 메시, 사운드 등 의존 에셋과 줌/미사용 플레이어 텔레포트 스킬 BP는 기존 열람 범위에서 제외합니다.
