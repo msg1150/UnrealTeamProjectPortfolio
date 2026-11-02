@@ -7,11 +7,18 @@
       "path": "PathLink/",
       "portfolio_baseline_commit": "2d5b0c733c93af8702e434e984767b7501b3d082",
       "rule": "Keep every file unchanged. Do not import later team changes without explicit user approval."
+    },
+    {
+      "path": "CharacterDisplay/",
+      "portfolio_baseline_commit": "380060d87cae864d9fa8c818e7763a6c882cfe10",
+      "rule": "Outline, nickname and display adapters are deferred by the user. Keep unchanged until explicitly approved."
     }
   ],
-  "frozen_notion_pages": ["3cea186e-6315-8043-bed8-c1bc5d9c8f1d"],
+  "frozen_notion_pages": ["3cea186e-6315-8043-bed8-c1bc5d9c8f1d", "3f7a186e-6315-8194-9b9c-f1b8000b3844"],
   "ownership_rule": "Review the first-parent diff of each merged PJH pull request. Do not treat unrelated commits inherited from main as personal work.",
-  "excluded_assets": ["Materials", "Meshes", "Sounds", "DataAsset instances", "Zoom BP", "Unused player teleport skill BP"],
+  "excluded_assets": ["Materials", "Meshes", "Sounds", "Binary DataAsset instances", "Zoom BP", "Unused player teleport skill BP", "Outline/nickname JSON and schema entries"],
+  "snapshot_rule": "Select work from merged PJH PRs only and copy its current main version. Exclude standalone branches and uncommitted working files. JSON exports are review examples, not ownership claims over all team data.",
+  "shared_file_rule": "Keep personal shared-file integration changes as Integration/PJH_RuntimeHooks.patch instead of copying whole team controllers or AI classes.",
   "unrelated_team_changes": "Do not sync ranking HUD, shared display names, server transitions, buffs, jump pads or JSON Manifest unless their changes are explicitly approved or verified as PJH work.",
   "legacy_portal_rule": "Retain OneWayTeleportActor, PortalViewSubsystem and TeleportDataAsset while SeamlessPortalActor inherits or references them."
 }

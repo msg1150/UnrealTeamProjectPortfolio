@@ -76,6 +76,7 @@ public:
 	FVector GetExitLaunchForward() const;
 
 protected:
+	virtual void EndPlay(const EEndPlayReason::Type reason) override;
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
@@ -292,7 +293,9 @@ protected:
 	// Core
 	// ---------------------------------------------------------------------
 
-	void TeleportCharacter(ACharacter* character);
+	virtual bool TeleportCharacter(ACharacter* character);
+	/** Spatial portals synchronize rotation together with the accepted arrival position. */
+	virtual bool UsesAtomicTeleportArrival() const { return false; }
 	FRotator GetExitFacingRotation() const;
 	FVector GetLaunchVelocity() const;
 

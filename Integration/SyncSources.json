@@ -1,0 +1,934 @@
+{
+  "updated": "2026-11-02",
+  "source_repository": "Qusbell/BattleArena",
+  "main_reviewed": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+  "selection": "Merged PJH PRs only; selected files use current main contents",
+  "personal_pull_requests": [
+    {
+      "Revision": "0468683174bc51857bf9fc0d4fa186ae4ec88275",
+      "Subject": "Merge pull request #793 from Qusbell/PJH_20261021_Portal"
+    },
+    {
+      "Revision": "f4e7fdd1304e9680d9cccf33a1feec0b72972da3",
+      "Subject": "Merge pull request #807 from Qusbell/PJH_20261025_Nickname"
+    },
+    {
+      "Revision": "23ba46f8c3626d659b54b6bd47bd9c22bbed2d60",
+      "Subject": "Merge pull request #809 from Qusbell/PJH_20261025_DeathCam"
+    },
+    {
+      "Revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "Subject": "Merge pull request #815 from Qusbell/PJH_20261025_Opt"
+    },
+    {
+      "Revision": "65cac002ce59f849b20325fca958dbe8e81c679d",
+      "Subject": "Merge pull request #821 from Qusbell/PJH_20261027_Portal"
+    },
+    {
+      "Revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "Subject": "Merge pull request #839 from Qusbell/PJH_20261027_CharacterPool"
+    },
+    {
+      "Revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "Subject": "Merge pull request #840 from Qusbell/PJH_20261028_WeaponHitEffect"
+    },
+    {
+      "Revision": "db74356e0579713f6661c6c4a1e732ced18dc3a6",
+      "Subject": "Merge pull request #841 from Qusbell/PJH_20261028_RailGunTraceChannel"
+    },
+    {
+      "Revision": "22b269afb76067816d1883ffa7bca5bfe05e508b",
+      "Subject": "Merge pull request #842 from Qusbell/PJH_20261028_Plasma"
+    },
+    {
+      "Revision": "b247e86622033b8acfe4576a466f7ca096e9da4a",
+      "Subject": "Merge pull request #845 from Qusbell/PJH_20261028_DropItem"
+    },
+    {
+      "Revision": "68a2708da4d118ee6363d745051162815deeb794",
+      "Subject": "Merge pull request #850 from Qusbell/PJH_20261029_Portal"
+    },
+    {
+      "Revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "Subject": "Merge pull request #856 from Qusbell/PJH_20261029"
+    },
+    {
+      "Revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "Subject": "Merge pull request #860 from Qusbell/PJH_20261029_GameplayValid"
+    },
+    {
+      "Revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "Subject": "Merge pull request #862 from Qusbell/PJH_20261029_Json"
+    },
+    {
+      "Revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "Subject": "Merge pull request #864 from Qusbell/PJH_20261030_Json"
+    },
+    {
+      "Revision": "0e4098d143ba8d853e91ebe36838e78feedc9b90",
+      "Subject": "Merge pull request #866 from Qusbell/PJH_20261030_PackageAll"
+    },
+    {
+      "Revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "Subject": "Merge pull request #874 from Qusbell/PJH_20261030_Portal"
+    },
+    {
+      "Revision": "675268c7079004eb1c3dfcb95f9ae171a243028e",
+      "Subject": "Merge pull request #876 from Qusbell/PJH_20261031_Setting"
+    }
+  ],
+  "files": [
+    {
+      "source": "Content/DataAssets/DA_AIAimBoundary.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_AIAimBoundary.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_BGMSetting_Default.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_BGMSetting_Default.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_DeathCamera_Default.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_DeathCamera_Default.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_DefaultAggression.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_DefaultAggression.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_DefaultLife.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_DefaultLife.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_DefaultPlayer.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_DefaultPlayer.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_InterpSpeed.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_InterpSpeed.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_KillStreakSettings.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_KillStreakSettings.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_MachineGun.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_MachineGun.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_MatchSetting.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_MatchSetting.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_MovementOption.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_MovementOption.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_Pistol.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_Pistol.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_PlasmaGun.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_PlasmaGun.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_RailGun.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_RailGun.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_Respawn.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_Respawn.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "675268c7079004eb1c3dfcb95f9ae171a243028e",
+      "status": "M"
+    },
+    {
+      "source": "Content/DataAssets/DA_RocketLauncher.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_RocketLauncher.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataAssets/DA_ShotGun.json",
+      "target": "JsonAssetSync/Examples/DataAssets/DA_ShotGun.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_AmmoItemTable.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_AmmoItemTable.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_BuffTable.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_BuffTable.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_DropItemSetting.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_DropItemSetting.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "675268c7079004eb1c3dfcb95f9ae171a243028e",
+      "status": "M"
+    },
+    {
+      "source": "Content/DataTables/DT_HeldItemTable.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_HeldItemTable.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_Item_Weight.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_Item_Weight.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_LifeItemTable.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_LifeItemTable.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_MapData.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_MapData.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/DataTables/DT_WeaponChange_Weight.json",
+      "target": "JsonAssetSync/Examples/DataTables/DT_WeaponChange_Weight.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "A"
+    },
+    {
+      "source": "Content/QuakeLike_1_0/HeldItem/Component/BPC_ProjectileFire.uasset",
+      "target": "Blueprints/Weapon/BPC_ProjectileFire.uasset",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "M"
+    },
+    {
+      "source": "Content/QuakeLike_1_0/HeldItem/Gun/BP_Weapon_PlasmaGun.uasset",
+      "target": "Blueprints/Weapon/BP_Weapon_PlasmaGun.uasset",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "M"
+    },
+    {
+      "source": "Content/QuakeLike_1_0/HeldItem/Gun/BP_Weapon_RocketLauncher.uasset",
+      "target": "Blueprints/Weapon/BP_Weapon_RocketLauncher.uasset",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "M"
+    },
+    {
+      "source": "Content/QuakeLike_1_0/HeldItem/Gun/BP_WeaponBase.uasset",
+      "target": "Blueprints/Weapon/BP_WeaponBase.uasset",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "M"
+    },
+    {
+      "source": "Content/QuakeLike_1_0/HeldItem/Projectile/BP_PlasmaProjectile.uasset",
+      "target": "Blueprints/Weapon/BP_PlasmaProjectile.uasset",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Content/QuakeLike_1_0/HeldItem/Projectile/BP_RocketLauncherProjectile.uasset",
+      "target": "Blueprints/Weapon/BP_RocketLauncherProjectile.uasset",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "M"
+    },
+    {
+      "source": "ExternalData/JsonAssetSyncManifest.json",
+      "target": "JsonAssetSync/JsonAssetSyncManifest.json",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "653ae8aa263c6dc5ac71f5982ec0ccab5deecf90",
+      "status": "M"
+    },
+    {
+      "source": "PackageAll.bat",
+      "target": "Integration/PackageAll.bat",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0e4098d143ba8d853e91ebe36838e78feedc9b90",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/GameplayValidationSubsystem.cpp",
+      "target": "GameplayValidator/GameplayValidationSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/GameplayValidatorEditorModule.cpp",
+      "target": "GameplayValidator/GameplayValidatorEditorModule.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/Integration/GameplayValidatorPathLinkBridge.cpp",
+      "target": "GameplayValidator/GameplayValidatorPathLinkBridge.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/Providers/JumpPadValidationProvider.cpp",
+      "target": "GameplayValidator/JumpPadValidationProvider.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/Providers/PortalValidationProvider.cpp",
+      "target": "GameplayValidator/PortalValidationProvider.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/UI/SGameplayValidationIssueRow.cpp",
+      "target": "GameplayValidator/SGameplayValidationIssueRow.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/UI/SGameplayValidationIssueRow.h",
+      "target": "GameplayValidator/SGameplayValidationIssueRow.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Private/UI/SGameplayValidatorPanel.cpp",
+      "target": "GameplayValidator/SGameplayValidatorPanel.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Public/GameplayValidationSubsystem.h",
+      "target": "GameplayValidator/GameplayValidationSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Public/Integration/GameplayValidatorPathLinkBridge.h",
+      "target": "GameplayValidator/GameplayValidatorPathLinkBridge.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Public/Providers/JumpPadValidationProvider.h",
+      "target": "GameplayValidator/JumpPadValidationProvider.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/GameplayValidator/Source/GameplayValidatorEditor/Public/Providers/PortalValidationProvider.h",
+      "target": "GameplayValidator/PortalValidationProvider.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Private/JsonApplyRegistrySave.cpp",
+      "target": "JsonAssetSync/JsonApplyRegistrySave.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "A"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Private/JsonAssetSyncSubsystem.cpp",
+      "target": "JsonAssetSync/JsonAssetSyncSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Private/JsonDataAssetProcessor.cpp",
+      "target": "JsonAssetSync/JsonDataAssetProcessor.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Private/JsonDataTableProcessor.cpp",
+      "target": "JsonAssetSync/JsonDataTableProcessor.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Private/JsonPropertyNameNormalizer.cpp",
+      "target": "JsonAssetSync/JsonPropertyNameNormalizer.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "A"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Private/JsonPropertyNameNormalizer.h",
+      "target": "JsonAssetSync/JsonPropertyNameNormalizer.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "A"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Public/JsonApplyRegistry.h",
+      "target": "JsonAssetSync/JsonApplyRegistry.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSync/Public/JsonAssetSyncSubsystem.h",
+      "target": "JsonAssetSync/JsonAssetSyncSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSyncEditor/Private/JsonAssetSyncEditor.cpp",
+      "target": "JsonAssetSync/JsonAssetSyncEditor.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Plugins/JsonAssetSync/Source/JsonAssetSyncEditor/Private/JsonAssetSyncPackagingPreflight.cpp",
+      "target": "JsonAssetSync/JsonAssetSyncPackagingPreflight.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Audio/BGMSettingsDataAsset.cpp",
+      "target": "Audio/BGMSettingsDataAsset.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "D"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Audio/BGMSubsystem.cpp",
+      "target": "Audio/BGMSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Camera/DeathCamActor.cpp",
+      "target": "DeathCam/DeathCamActor.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "23ba46f8c3626d659b54b6bd47bd9c22bbed2d60",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Character/CharacterAppearanceComponent.cpp",
+      "target": "CharacterAppearance/CharacterAppearanceComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Character/CharacterPoolComponent.cpp",
+      "target": "CharacterPool/CharacterPoolComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Character/CharacterPoolLibrary.cpp",
+      "target": "CharacterPool/CharacterPoolLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Character/CharacterPoolReflection.h",
+      "target": "CharacterPool/CharacterPoolReflection.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Character/CharacterPoolSubsystem.cpp",
+      "target": "CharacterPool/CharacterPoolSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Items/DeathDropCarrier.cpp",
+      "target": "DeathDrop/DeathDropCarrier.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "b247e86622033b8acfe4576a466f7ca096e9da4a",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Items/DeathDropSubsystem.cpp",
+      "target": "DeathDrop/DeathDropSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "22b269afb76067816d1883ffa7bca5bfe05e508b",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Loading/LoadingBlueprintLibrary.cpp",
+      "target": "Loading/LoadingBlueprintLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Loading/LoadingCoordinator.cpp",
+      "target": "Loading/LoadingCoordinator.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Loading/LoadingScreenSubsystem.cpp",
+      "target": "Loading/LoadingScreenSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Tests/CharacterPoolResetTests.cpp",
+      "target": "CharacterPool/CharacterPoolResetTests.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Tests/ProjectilePoolSettingsTests.cpp",
+      "target": "Weapon/ProjectilePoolSettingsTests.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Tests/SeamlessPortalTests.cpp",
+      "target": "Teleport/SeamlessPortalTests.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/InitialWeaponLoadoutComponent.cpp",
+      "target": "Weapon/InitialWeaponLoadoutComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "22b269afb76067816d1883ffa7bca5bfe05e508b",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/InitialWeaponLoadoutDataAsset.cpp",
+      "target": "Weapon/InitialWeaponLoadoutDataAsset.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "22b269afb76067816d1883ffa7bca5bfe05e508b",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectileConvergenceComponent.cpp",
+      "target": "Weapon/ProjectileConvergenceComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectileFirstPersonRenderingComponent.cpp",
+      "target": "Weapon/ProjectileFirstPersonRenderingComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectileImpactEffectLibrary.cpp",
+      "target": "Weapon/ProjectileImpactEffectLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectilePoolComponent.cpp",
+      "target": "Weapon/ProjectilePoolComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectilePoolLibrary.cpp",
+      "target": "Weapon/ProjectilePoolLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectilePoolSettings.cpp",
+      "target": "Weapon/ProjectilePoolSettings.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectilePoolSubsystem.cpp",
+      "target": "Weapon/ProjectilePoolSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/ProjectileWorldCollisionComponent.cpp",
+      "target": "Weapon/ProjectileWorldCollisionComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Private/Weapon/WeaponProjectileAimLibrary.cpp",
+      "target": "Weapon/WeaponProjectileAimLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Audio/BGMSettingsDataAsset.h",
+      "target": "Audio/BGMSettingsDataAsset.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Audio/BGMSubsystem.h",
+      "target": "Audio/BGMSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Camera/DeathCamActor.h",
+      "target": "DeathCam/DeathCamActor.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "23ba46f8c3626d659b54b6bd47bd9c22bbed2d60",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Character/CharacterAppearanceComponent.h",
+      "target": "CharacterAppearance/CharacterAppearanceComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Character/CharacterPoolComponent.h",
+      "target": "CharacterPool/CharacterPoolComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Character/CharacterPoolLibrary.h",
+      "target": "CharacterPool/CharacterPoolLibrary.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Character/CharacterPoolSettings.h",
+      "target": "CharacterPool/CharacterPoolSettings.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Character/CharacterPoolSubsystem.h",
+      "target": "CharacterPool/CharacterPoolSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Items/DeathDropSubsystem.h",
+      "target": "DeathDrop/DeathDropSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Loading/LoadingCoordinator.h",
+      "target": "Loading/LoadingCoordinator.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Loading/LoadingScreenSubsystem.h",
+      "target": "Loading/LoadingScreenSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "aedd81fb870bbb17ac5e6791a24906fbf06cd6db",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/InitialWeaponLoadoutComponent.h",
+      "target": "Weapon/InitialWeaponLoadoutComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/InitialWeaponLoadoutDataAsset.h",
+      "target": "Weapon/InitialWeaponLoadoutDataAsset.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "22b269afb76067816d1883ffa7bca5bfe05e508b",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectileConvergenceComponent.h",
+      "target": "Weapon/ProjectileConvergenceComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectileFirstPersonRenderingComponent.h",
+      "target": "Weapon/ProjectileFirstPersonRenderingComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectileImpactEffectLibrary.h",
+      "target": "Weapon/ProjectileImpactEffectLibrary.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectilePoolComponent.h",
+      "target": "Weapon/ProjectilePoolComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectilePoolLibrary.h",
+      "target": "Weapon/ProjectilePoolLibrary.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectilePoolSettings.h",
+      "target": "Weapon/ProjectilePoolSettings.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectilePoolSubsystem.h",
+      "target": "Weapon/ProjectilePoolSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Public/Weapon/ProjectileWorldCollisionComponent.h",
+      "target": "Weapon/ProjectileWorldCollisionComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "0f42499892cbde3d7d57f25f6cc647ac534f08c6",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/ShootingArena.cpp",
+      "target": "GameplayValidator/ShootingArenaModule.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "95085caf2bdcced4ddc707daafa1e412d45224fe",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/SpawnSelectionSystem/SpawnSelectionComponent.cpp",
+      "target": "SpawnSelectionSystem/SpawnSelectionComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/OneWayTeleportActor.cpp",
+      "target": "Teleport/OneWayTeleportActor.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/OneWayTeleportActor.h",
+      "target": "Teleport/OneWayTeleportActor.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/PortalViewSubsystem.cpp",
+      "target": "Teleport/PortalViewSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/PortalViewSubsystem.h",
+      "target": "Teleport/PortalViewSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/SeamlessPortalActor.cpp",
+      "target": "Teleport/SeamlessPortalActor.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/SeamlessPortalActor.h",
+      "target": "Teleport/SeamlessPortalActor.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/SeamlessPortalSyncComponent.cpp",
+      "target": "Teleport/SeamlessPortalSyncComponent.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/SeamlessPortalSyncComponent.h",
+      "target": "Teleport/SeamlessPortalSyncComponent.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "65cac002ce59f849b20325fca958dbe8e81c679d",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/SeamlessPortalTraversalSubsystem.cpp",
+      "target": "Teleport/SeamlessPortalTraversalSubsystem.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/SeamlessPortalTraversalSubsystem.h",
+      "target": "Teleport/SeamlessPortalTraversalSubsystem.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a4d0b0d2f350cc7165b44c2a01e30b82c013e2a5",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArena/Teleport/TeleportDataAsset.h",
+      "target": "Teleport/TeleportDataAsset.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "65cac002ce59f849b20325fca958dbe8e81c679d",
+      "status": "M"
+    },
+    {
+      "source": "Source/ShootingArenaEditorTools/Private/CharacterPoolMigrationLibrary.cpp",
+      "target": "CharacterPool/Editor/CharacterPoolMigrationLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArenaEditorTools/Private/CharacterPoolMigrationLibrary.h",
+      "target": "CharacterPool/Editor/CharacterPoolMigrationLibrary.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "68e2c9fbc9eecb9e1d01aba94b03df68a5957356",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArenaEditorTools/Private/ProjectilePoolMigrationLibrary.cpp",
+      "target": "Weapon/Editor/ProjectilePoolMigrationLibrary.cpp",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "A"
+    },
+    {
+      "source": "Source/ShootingArenaEditorTools/Private/ProjectilePoolMigrationLibrary.h",
+      "target": "Weapon/Editor/ProjectilePoolMigrationLibrary.h",
+      "main_revision": "8572770d64c6e367ec46a833a1dd0f81cc850510",
+      "personal_revision": "a7dde7f57366f5a10497752315b97bedcb260dec",
+      "status": "A"
+    }
+  ],
+  "curation": {
+    "manifest_omitted_entries": [
+      "DA_ShooterOutline_Default",
+      "DA_ShooterNickname_Default"
+    ],
+    "frozen_paths": [
+      "PathLink/",
+      "CharacterDisplay/"
+    ],
+    "shared_code": "Integration/PJH_RuntimeHooks.patch",
+    "standalone_branches": "Excluded"
+  }
+}

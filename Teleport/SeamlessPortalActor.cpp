@@ -2,11 +2,14 @@
 
 #include "SeamlessPortalMath.h"
 #include "SeamlessPortalTraversalSubsystem.h"
+#include "SeamlessPortalSyncComponent.h"
+#include "Character/CharacterPoolComponent.h"
 #include "PortalTraversalGuard.h"
 #include "TeleportDataAsset.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Engine/World.h"
@@ -24,6 +27,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "MeshDescription.h"
 #include "StaticMeshAttributes.h"
+#include "Misc/App.h"
+#include "HAL/PlatformProperties.h"
 #if WITH_EDITOR
 #include "ScopedTransaction.h"
 #endif
@@ -34,6 +39,9 @@ namespace SpatialPortalGeometry
 	static TWeakObjectPtr<UStaticMesh> EllipseMesh;
 	static UStaticMesh* GetEllipseMesh()
 	{
+		// InitResources is forbidden in headless cooked runs. This surface is visual only;
+		// traversal uses the opening dimensions and does not require generated render data.
+		if (!FApp::CanEverRender() && FPlatformProperties::RequiresCookedData()) return nullptr;
 		if (EllipseMesh.IsValid()) return EllipseMesh.Get();
 		FMeshDescription description;
 		FStaticMeshAttributes attributes(description);
@@ -90,6 +98,21 @@ ASeamlessPortalActor::ASeamlessPortalActor()
 	portalShapeScale = FVector2D(3.5, 5);
 	portalCollisionDepth = 2.0f;
 	bEllipticalOpening = true;
+	vfxFrontOffsetRoot = CreateDefaultSubobject<USceneComponent>(TEXT("VFXFrontOffset"));
+	vfxFrontOffsetRoot->SetupAttachment(root);
+	portalVFX->SetupAttachment(vfxFrontOffsetRoot);
+	nearbyCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("NearbyCollision"));
+	nearbyCollision->SetupAttachment(entryCollision);
+	nearbyCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	nearbyCollision->SetCollisionObjectType(ECC_WorldDynamic);
+	nearbyCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+	nearbyCollision->SetCollisionResponseToChannel(ECC_Pawn,ECR_Overlap);
+	nearbyCollision->SetGenerateOverlapEvents(true);
+	nearbyCollision->SetCanEverAffectNavigation(false);
+	// Hard reference for cooking; never load settings during a capture tick.
+	static ConstructorHelpers::FObjectFinder<UTeleportDataAsset> projectPortalInfo(
+		TEXT("/Game/QuakeLike_1_0/Portal/DA_PortalInfo_Default.DA_PortalInfo_Default"));
+	if (projectPortalInfo.Succeeded()) defaultPortalInfo = projectPortalInfo.Object;
 	// Code-only default: opaque unlit texture, with ordinary planar UVs and no distance fade.
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> material(
 		TEXT("/Engine/EngineMaterials/Widget3DPassThrough_Opaque.Widget3DPassThrough_Opaque"));
@@ -98,7 +121,8 @@ ASeamlessPortalActor::ASeamlessPortalActor()
 
 const UTeleportDataAsset* ASeamlessPortalActor::GetTeleportDataAsset() const
 {
-	return IsValid(teleportDA) ? teleportDA.Get() : GetDefault<UTeleportDataAsset>();
+	if (IsValid(teleportDA)) return teleportDA.Get();
+	return IsValid(defaultPortalInfo) ? defaultPortalInfo.Get() : GetDefault<UTeleportDataAsset>();
 }
 
 void ASeamlessPortalActor::OnConstruction(const FTransform& transform)
@@ -107,6 +131,8 @@ void ASeamlessPortalActor::OnConstruction(const FTransform& transform)
 	Super::OnConstruction(transform);
 	UpdateSpatialOpening();
 	AlignSpatialScreen();
+	UpdateVFXFrontOffset();
+	UpdateNearbyCollision();
 }
 
 void ASeamlessPortalActor::PostRegisterAllComponents()
@@ -118,6 +144,8 @@ void ASeamlessPortalActor::PostRegisterAllComponents()
 		UpdatePortalVisual();
 		UpdateSpatialOpening();
 		AlignSpatialScreen();
+		UpdateVFXFrontOffset();
+		UpdateNearbyCollision();
 	}
 }
 
@@ -125,28 +153,66 @@ void ASeamlessPortalActor::BeginPlay()
 {
 	cachedActorExit.Reset();
 	Super::BeginPlay();
+	if (!IsValid(this) || !IsValid(GetWorld()) || GetWorld()->bIsTearingDown
+		|| !IsValid(entryCollision) || !IsValid(nearbyCollision)) return;
 	UpdateSpatialOpening();
 	AlignSpatialScreen();
-	// Plane crossings are processed once per authority world. Legacy overlap-launch is not used.
-	if (IsValid(entryCollision))
-	{
-		entryCollision->SetGenerateOverlapEvents(false);
-		entryCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
+	UpdateVFXFrontOffset();
 	if (HasAuthority()) replicatedDestination = exitTarget;
 	if (auto* subsystem = GetWorld()->GetSubsystem<USeamlessPortalTraversalSubsystem>()) subsystem->RegisterPortal(this);
+	nearbyCollision->OnComponentBeginOverlap.AddUniqueDynamic(this,&ASeamlessPortalActor::OnNearbyBegin);
+	nearbyCollision->OnComponentEndOverlap.AddUniqueDynamic(this,&ASeamlessPortalActor::OnNearbyEnd);
+	bOverlapReady = true;
+	UpdateNearbyCollision();
+	UpdateTeleportActivation();
+	// Components may already overlap before BeginPlay binds their delegates.
+	TArray<AActor*> nearby;
+	nearbyCollision->GetOverlappingActors(nearby,ACharacter::StaticClass());
+	for (auto* actor:nearby) OnNearbyBegin(nearbyCollision,actor,nullptr,0,false,FHitResult());
+	nearby.Reset();
+	entryCollision->GetOverlappingActors(nearby,ACharacter::StaticClass());
+	for (auto* actor:nearby) OnEntryBeginOverlap(entryCollision,actor,nullptr,0,false,FHitResult());
 }
 
 void ASeamlessPortalActor::EndPlay(const EEndPlayReason::Type reason)
 {
+	bOverlapReady = false;
 	if (UWorld* world = GetWorld())
 		if (auto* subsystem = world->GetSubsystem<USeamlessPortalTraversalSubsystem>()) subsystem->UnregisterPortal(this);
 	Super::EndPlay(reason);
 }
 
-void ASeamlessPortalActor::OnEntryBeginOverlap(UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32, bool, const FHitResult&)
+void ASeamlessPortalActor::OnEntryBeginOverlap(UPrimitiveComponent*, AActor* actor, UPrimitiveComponent*, int32, bool, const FHitResult&)
 {
-	// Deliberately not the legacy teleport/LaunchCharacter path.
+	if (!bOverlapReady || !HasAuthority() || !IsValid(GetWorld())) return;
+	if (auto* character=Cast<ACharacter>(actor))
+		if (auto* subsystem=GetWorld()->GetSubsystem<USeamlessPortalTraversalSubsystem>()) subsystem->NotifyEntry(this,character);
+}
+
+void ASeamlessPortalActor::UpdateNearbyCollision()
+{
+	if (!IsValid(nearbyCollision) || !IsValid(entryCollision)) return;
+	const FVector scale=entryCollision->GetComponentScale().GetAbs();
+	FVector extent=entryCollision->GetUnscaledBoxExtent();
+	// Prefetch the owner RPC endpoint and wall exclusions before the thin entry trigger is reached.
+	// This component never initiates traversal and never changes the visible portal dimensions.
+	extent.X += (200.0+GetPassageFrontExtent())/FMath::Max(scale.X,double(UE_SMALL_NUMBER));
+	nearbyCollision->SetBoxExtent(extent,bOverlapReady);
+}
+
+void ASeamlessPortalActor::OnNearbyBegin(UPrimitiveComponent*,AActor* actor,UPrimitiveComponent*,int32,bool,const FHitResult&)
+{
+	if (!bOverlapReady || !IsValid(GetWorld())) return;
+	if (auto* character=Cast<ACharacter>(actor))
+		if (auto* subsystem=GetWorld()->GetSubsystem<USeamlessPortalTraversalSubsystem>()) subsystem->NotifyNearby(this,character,true);
+}
+
+void ASeamlessPortalActor::OnNearbyEnd(UPrimitiveComponent*,AActor* actor,UPrimitiveComponent*,int32)
+{
+	if (!bOverlapReady || !IsValid(GetWorld())) return;
+	if (auto* character=Cast<ACharacter>(actor))
+		if (!nearbyCollision->IsOverlappingActor(character))
+			if (auto* subsystem=GetWorld()->GetSubsystem<USeamlessPortalTraversalSubsystem>()) subsystem->NotifyNearby(this,character,false);
 }
 
 void ASeamlessPortalActor::UpdateSpatialOpening()
@@ -245,6 +311,16 @@ void ASeamlessPortalActor::AlignSpatialScreen()
 	screenRestRelative = portalScreen->GetRelativeTransform();
 }
 
+void ASeamlessPortalActor::UpdateVFXFrontOffset()
+{
+	if (!IsValid(root) || !IsValid(entryCollision) || !IsValid(portalVFX) || !IsValid(vfxFrontOffsetRoot)) return;
+	// A separate parent avoids accumulating offsets on reconstruction and preserves arbitrary
+	// designer-authored VFX location/rotation. The distance remains 2cm even with actor scale.
+	if (portalVFX->GetAttachParent() != vfxFrontOffsetRoot)
+		portalVFX->AttachToComponent(vfxFrontOffsetRoot, FAttachmentTransformRules::KeepRelativeTransform);
+	vfxFrontOffsetRoot->SetWorldLocation(root->GetComponentLocation() + entryCollision->GetForwardVector() * 2.0);
+}
+
 void ASeamlessPortalActor::SetDestination(AActor* destination)
 {
 	if (GetWorld() && GetWorld()->IsGameWorld() && !HasAuthority()) return;
@@ -252,6 +328,8 @@ void ASeamlessPortalActor::SetDestination(AActor* destination)
 	exitTarget = destination;
 	cachedActorExit.Reset();
 	replicatedDestination = destination;
+	UpdateTeleportActivation();
+	UpdateNearbyCollision();
 	ForceNetUpdate();
 }
 
@@ -265,6 +343,8 @@ void ASeamlessPortalActor::OnRep_Destination()
 {
 	exitTarget = replicatedDestination;
 	cachedActorExit.Reset();
+	UpdateTeleportActivation();
+	UpdateNearbyCollision();
 }
 
 bool ASeamlessPortalActor::GetDestinationFrame(FTransform& frame) const
@@ -364,9 +444,16 @@ bool ASeamlessPortalActor::BuildPortalCaptureView(const FTransform& camera, FPor
 {
 	view = FPortalCaptureView();
 	FTransform destination;
-	if (camera.ContainsNaN() || !GetDestinationFrame(destination)) return false;
-	const FVector eye = SeamlessPortalMath::MapPoint(GetPortalFrameTransform(), destination, camera.GetLocation());
-	if (!SeamlessPortalMath::BuildWindowProjection(destination.InverseTransformPositionNoScale(eye),
+	if (camera.ContainsNaN() || !FMath::IsFinite(nearViewLockDistance) || !GetDestinationFrame(destination)) return false;
+	const FVector mappedEye = SeamlessPortalMath::MapPoint(GetPortalFrameTransform(), destination, camera.GetLocation());
+	FVector localEye = destination.InverseTransformPositionNoScale(mappedEye);
+	// Reject the back side before clamping; a minimum depth must never turn it into a front view.
+	if (localEye.ContainsNaN() || localEye.X >= -0.001) return false;
+	// Clamp only approach depth. No cached frame/state is kept, so retreating and lateral motion
+	// remain continuous and a different viewer cannot inherit a previous viewer's frozen camera.
+	localEye.X = FMath::Min(localEye.X, -double(FMath::Max(0.0f, nearViewLockDistance)));
+	const FVector eye = destination.TransformPositionNoScale(localEye);
+	if (!SeamlessPortalMath::BuildWindowProjection(localEye,
 		GetOpeningHalfSize(), 0.0, view.projection)) return false;
 	// A fixed orientation plus an asymmetric frustum represents a physical window; the eye still moves in 3D.
 	view.transform = FTransform(destination.GetRotation(), eye);
@@ -381,11 +468,6 @@ FTransform ASeamlessPortalActor::GetPortalViewCameraTransform(const FTransform& 
 {
 	FPortalCaptureView view;
 	return BuildPortalCaptureView(camera, view) ? view.transform : FTransform::Identity;
-}
-
-bool ASeamlessPortalActor::NeedsFullRatePortalView(float distance) const
-{
-	return FMath::IsFinite(fullRateDistance) && distance <= FMath::Max(0.0f, fullRateDistance);
 }
 
 bool ASeamlessPortalActor::CanDisplayPortalView(const APlayerController* controller, const FVector& location,
@@ -462,24 +544,6 @@ void ASeamlessPortalActor::ApplyPortalView(UTextureRenderTarget2D* target, float
 	portalScreen->SetHiddenInGame(false);
 }
 
-bool ASeamlessPortalActor::FitsAt(const ACharacter* character, const FVector& position) const
-{
-	const UCapsuleComponent* capsule = IsValid(character) ? character->GetCapsuleComponent() : nullptr;
-	if (!IsValid(capsule)) return false;
-	const double radius = capsule->GetScaledCapsuleRadius();
-	const double halfHeight = capsule->GetScaledCapsuleHalfHeight();
-	if (bAllowPartialCapsuleEntry)
-		return SeamlessPortalMath::CapsuleTouchesOpening(GetPortalFrameTransform(), position,
-			capsule->GetUpVector(), radius, halfHeight, GetOpeningHalfSize(), bEllipticalOpening);
-	if (!FMath::IsFinite(headAndFootTolerance)) return false;
-	// Only shorten the projected head/foot ends, never the torso radius. Keep at least half of the
-	// cylindrical segment even on small/crouched characters or with an excessive tolerance value.
-	const double allowance = FMath::Clamp(double(headAndFootTolerance),0.0,FMath::Max(0.0,(halfHeight-radius)*0.5));
-	return SeamlessPortalMath::CapsuleFits(GetPortalFrameTransform(), position,
-		capsule->GetUpVector(), radius, halfHeight-allowance,
-		GetOpeningHalfSize() + FVector2D(1.0, 1.0), bEllipticalOpening);
-}
-
 double ASeamlessPortalActor::GetCapsuleNormalExtent(const ACharacter* character) const
 {
 	const UCapsuleComponent* capsule = IsValid(character) ? character->GetCapsuleComponent() : nullptr;
@@ -504,36 +568,30 @@ double ASeamlessPortalActor::GetPassageFrontExtent() const
 	return extent;
 }
 
-bool ASeamlessPortalActor::FindCrossing(const ACharacter* character, const FVector& previous, double& fraction) const
+bool ASeamlessPortalActor::TryTraverseFromOverlap(ACharacter* character, FVector& safeExit) const
 {
-	if (!CanTraverse() || !IsValid(character) || !FMath::IsFinite(maximumTraversalStep)
-		|| maximumTraversalStep <= 0 || FVector::DistSquared(previous, character->GetActorLocation()) > FMath::Square(maximumTraversalStep)) return false;
-	const FTransform frame = GetPortalFrameTransform();
-	if (bAllowPartialCapsuleEntry)
-	{
-		const UCapsuleComponent* capsule = character->GetCapsuleComponent();
-		return IsValid(capsule) && SeamlessPortalMath::FindFrontCapsuleContact(frame,previous,character->GetActorLocation(),
-			capsule->GetUpVector(),capsule->GetScaledCapsuleRadius(),capsule->GetScaledCapsuleHalfHeight(),
-			GetOpeningHalfSize(),bEllipticalOpening,fraction);
-	}
-	FVector local;
-	return SeamlessPortalMath::FindFrontCrossing(frame.InverseTransformPositionNoScale(previous),
-		frame.InverseTransformPositionNoScale(character->GetActorLocation()), local, fraction)
-		&& FitsAt(character, frame.TransformPositionNoScale(local));
-}
-
-bool ASeamlessPortalActor::TryTraverse(ACharacter* character, const FVector& previous, FVector& safeExit) const
-{
-	double fraction;
 	FTransform destination;
 	UWorld* world = GetWorld();
-	if (!IsValid(this) || !HasAuthority() || !IsValid(character) || !IsValid(world) || world->bIsTearingDown
-		|| character->GetWorld() != world || !FMath::IsFinite(reentryLockDuration)
-		|| !FindCrossing(character, previous, fraction) || !GetDestinationFrame(destination)
+	if (!IsValid(this) || !HasAuthority() || !IsValid(character) || !character->HasAuthority() || !IsValid(world) || world->bIsTearingDown
+		|| character->GetWorld() != world || !character->GetActorEnableCollision()
+		|| !bTeleportEnabled || UCharacterPoolComponent::IsInactive(character)
+		|| !FMath::IsFinite(reentryLockDuration) || !GetDestinationFrame(destination)
 		|| PortalTraversalGuard::IsLocked(character, world->GetTimeSeconds())) return false;
 	UCharacterMovementComponent* movement = character->GetCharacterMovement();
 	UCapsuleComponent* capsule = character->GetCapsuleComponent();
-	if (!IsValid(movement) || !IsValid(capsule)) return false;
+	if (!IsValid(movement) || !IsValid(capsule) || !capsule->IsQueryCollisionEnabled()) return false;
+	const TWeakObjectPtr<UCharacterPoolComponent> pool=character->FindComponentByClass<UCharacterPoolComponent>();
+	const int32 generation=pool.IsValid() ? pool->Life.Generation : INDEX_NONE;
+	auto CanFinishArrival=[&]()
+	{
+		return IsValid(character) && IsValid(movement) && character->GetCharacterMovement()==movement
+			&& character->GetActorEnableCollision() && !UCharacterPoolComponent::IsInactive(character)
+			&& character->FindComponentByClass<UCharacterPoolComponent>()==pool.Get()
+			&& (generation==INDEX_NONE || (pool.IsValid() && pool->Life.Generation==generation))
+			&& IsValid(world) && !world->bIsTearingDown;
+	};
+	USeamlessPortalSyncComponent* sync = USeamlessPortalSyncComponent::FindOrCreate(character);
+	if (!IsValid(this) || !CanFinishArrival()) return false;
 	const FTransform entry = GetPortalFrameTransform();
 	const FVector right = destination.GetRotation().GetRightVector();
 	auto MapArrival = [&](const FVector& point)
@@ -545,20 +603,19 @@ bool ASeamlessPortalActor::TryTraverse(ACharacter* character, const FVector& pre
 	};
 	FVector position = MapArrival(character->GetActorLocation());
 	const FVector velocity = SeamlessPortalMath::MapVector(entry, destination, movement->Velocity);
-	const FRotator facing(0, SeamlessPortalMath::MapRotation(entry, destination, character->GetActorQuat()).Rotator().Yaw, 0);
+	// Reuse the legacy exit-facing rule: destination actor yaw, with a level view.
+	const FRotator facing = GetExitFacingRotation();
 	if (position.ContainsNaN() || velocity.ContainsNaN() || facing.ContainsNaN()) return false;
 	const auto* exitPortal = Cast<ASeamlessPortalActor>(exitTarget);
-	if (exitPortal && !exitPortal->FitsAt(character, position)) return false;
 	const FVector normal = destination.GetRotation().GetForwardVector();
 	const double extent = capsule->GetScaledCapsuleRadius()
 		+ (capsule->GetScaledCapsuleHalfHeight() - capsule->GetScaledCapsuleRadius()) * FMath::Abs(normal.Z);
 	safeExit = position + normal * FMath::Max(0.0, extent + (exitPortal ? exitPortal->GetPassageFrontExtent() : 0)
 		+ 2.0 - FVector::DotProduct(position - destination.GetLocation(), normal));
 	if (safeExit.ContainsNaN()) return false;
-	// Early contact maps the source centre behind the exit. Emerge clear of the exit plane instead;
-	// retain tangential placement, rotation and velocity, and preserve the former mapping for late steps.
-	if (bAllowPartialCapsuleEntry && FVector::DotProduct(position-destination.GetLocation(),normal) < 0)
-		position = safeExit;
+	// Any partial box overlap is accepted at the entrance. Place the complete capsule clear of
+	// the exit plane/wall, retaining height, central alignment and redirected momentum.
+	position = safeExit;
 	FCollisionQueryParams query(SCENE_QUERY_STAT(SpatialPortalDestination), false, character);
 	query.AddIgnoredActor(this);
 	// Only a portal's own visual/trigger is exempt. A mesh used as an anchor remains solid.
@@ -567,43 +624,43 @@ bool ASeamlessPortalActor::TryTraverse(ACharacter* character, const FVector& pre
 	if (exitPortal) for (AActor* wall : exitPortal->passageWalls) if (IsValid(wall)) query.AddIgnoredActor(wall);
 	const FCollisionResponseParams responses(capsule->GetCollisionResponseToChannels());
 	const FCollisionShape shape = FCollisionShape::MakeCapsule(capsule->GetScaledCapsuleRadius(), capsule->GetScaledCapsuleHalfHeight());
-	if (world->OverlapBlockingTestByChannel(position, facing.Quaternion(), capsule->GetCollisionObjectType(), shape, query, responses)
-		|| world->OverlapBlockingTestByChannel(safeExit, facing.Quaternion(), capsule->GetCollisionObjectType(), shape, query, responses)) return false;
+	if (world->OverlapBlockingTestByChannel(position, facing.Quaternion(), capsule->GetCollisionObjectType(), shape, query, responses)) return false;
+	// A swept overlap can finish far past the entry. Keep the exit-side path check so an
+	// empty landing point cannot tunnel through an intervening destination obstruction.
+	const double clearDistance=extent+(exitPortal ? exitPortal->GetPassageFrontExtent() : 0)+2.0;
+	const FVector sweepStart=position+normal*(clearDistance-FVector::DotProduct(position-destination.GetLocation(),normal));
 	FHitResult hit;
-	const FVector crossing = FMath::Lerp(previous, character->GetActorLocation(), fraction);
-	// Validate the actual centred arrival path, not an imaginary path from the old edge position.
-	FVector sweepStart = MapArrival(crossing);
-	if (bAllowPartialCapsuleEntry)
-		sweepStart += normal*FMath::Max(0.0,extent+(exitPortal ? exitPortal->GetPassageFrontExtent() : 0)+2.0
-			-FVector::DotProduct(sweepStart-destination.GetLocation(),normal));
-	if (world->SweepSingleByChannel(hit, sweepStart, position,
-		facing.Quaternion(), capsule->GetCollisionObjectType(), shape, query, responses)) return false;
+	if (world->SweepSingleByChannel(hit,sweepStart,position,facing.Quaternion(),capsule->GetCollisionObjectType(),shape,query,responses)) return false;
 	PortalTraversalGuard::Lock(character, world->GetTimeSeconds() + FMath::Max(0.01f, reentryLockDuration));
 	if (!character->TeleportTo(position, facing, false, true))
-	{ PortalTraversalGuard::Unlock(character); return false; }
+	{
+		PortalTraversalGuard::Unlock(character); return false;
+	}
 	// The teleport already succeeded: do not report a failure and roll back a valid arrival
 	// merely because an arrival callback removed this portal or its movement component.
-	if (!IsValid(this) || !IsValid(character) || !IsValid(movement) || world->bIsTearingDown) return true;
+	if (!IsValid(this) || !CanFinishArrival()) return true;
 	character->SetBase(nullptr);
-	if (!IsValid(this) || !IsValid(character) || !IsValid(movement) || world->bIsTearingDown) return true;
+	if (!IsValid(this) || !CanFinishArrival()) return true;
 	movement->Velocity = velocity;
 	movement->bJustTeleported = true;
 	movement->SetMovementMode(MOVE_Falling);
 	// Movement-mode/base delegates may destroy either actor or begin a level transition.
-	if (!IsValid(this) || !IsValid(character) || world->bIsTearingDown) return true;
+	if (!IsValid(this) || !CanFinishArrival()) return true;
 	if (AController* controller = character->GetController())
 	{
-		const FRotator control = SeamlessPortalMath::MapRotation(entry, destination, controller->GetControlRotation().Quaternion()).Rotator();
-		controller->SetControlRotation(FRotator(control.Pitch, control.Yaw, 0));
+		controller->SetControlRotation(facing);
+		// Absolute-rotation roots can run transform delegates from SetControlRotation.
+		if (!IsValid(this) || !CanFinishArrival()) return true;
 		if (auto* player = Cast<APlayerController>(controller))
 		{
-			player->ClientSetRotation(FRotator(control.Pitch, control.Yaw, 0), false);
+			// Position and rotation are sent together through the owner endpoint.
 			const auto* settings = GetTeleportDataAsset();
-			if (IsValid(settings) && IsValid(settings->teleportSound) && FMath::IsFinite(settings->soundVolumeMultiplier))
+			if (IsValid(player) && IsValid(settings) && IsValid(settings->teleportSound) && FMath::IsFinite(settings->soundVolumeMultiplier))
 				player->ClientPlaySound(settings->teleportSound, FMath::Max(0.0f, settings->soundVolumeMultiplier));
 		}
 	}
-	character->ForceNetUpdate();
+	if (IsValid(sync) && CanFinishArrival()) sync->SendArrival();
+	if (IsValid(character) && !world->bIsTearingDown) character->ForceNetUpdate();
 	return true;
 }
 
@@ -639,4 +696,5 @@ void ASeamlessPortalActor::CopyPresentationFromSource()
 	UpdatePortalVisual();
 	UpdateSpatialOpening();
 	AlignSpatialScreen();
+	UpdateVFXFrontOffset();
 }

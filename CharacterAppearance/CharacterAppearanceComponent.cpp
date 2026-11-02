@@ -1,6 +1,12 @@
 #include "Character/CharacterAppearanceComponent.h"
 
 #include "Animation/AnimInstance.h"
+#include "Character/CharacterPoolComponent.h"
+#include "Character/CharacterPoolSubsystem.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/PlayerState.h"
+#include "UObject/StructOnScope.h"
+#include "UObject/UnrealType.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
@@ -20,6 +26,20 @@ UCharacterAppearanceComponent::UCharacterAppearanceComponent()
 void UCharacterAppearanceComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	// Resolve a dedicated participant's selection before creating a fallback AnimInstance.
+	if (GetOwner()->HasAuthority())
+		if (const auto* Controller = Cast<AController>(GetOwner()->GetOwner()))
+			if (const auto* Pool = GetWorld()->GetSubsystem<UCharacterPoolSubsystem>(); Pool && Pool->FindOwnedPawn(const_cast<AController*>(Controller)) == GetOwner())
+				if (APlayerState* State = Controller->PlayerState)
+					if (UFunction* Function = State->FindFunction(TEXT("GetCharacterModeling")))
+					{
+						FStructOnScope Params(Function);
+						State->ProcessEvent(Function, Params.GetStructMemory());
+						const auto* Valid = FindFProperty<FBoolProperty>(Function, TEXT("valid"));
+						const auto* Row = FindFProperty<FNameProperty>(Function, TEXT("characterModeling"));
+						if (Valid && Row && Valid->GetPropertyValue_InContainer(Params.GetStructMemory())
+							&& SetModelingRowName(Row->GetPropertyValue_InContainer(Params.GetStructMemory()))) return;
+					}
 
 	// DataTable 설정이 모든 Client에서 동일한 경우, 로컬에서도 즉시 적용해 메시 로딩 지연을 줄입니다.
 	if (!activeModelingId.IsEmpty())
@@ -94,6 +114,17 @@ bool UCharacterAppearanceComponent::SetModelingRowName(const FName newModelingRo
 
 	activeModelingId = newModelingRowName.ToString();
 	return ApplyModelingIdInternal(activeModelingId);
+}
+
+bool UCharacterAppearanceComponent::SetModelingRowNameLocal(const FName newModelingRowName)
+{
+	if (newModelingRowName.IsNone())
+	{
+		UE_LOG(LogCharacterAppearance, Warning, TEXT("빈 Modeling Row Name은 적용할 수 없습니다. Owner=%s"), *GetNameSafe(GetOwner()));
+		return false;
+	}
+
+	return ApplyModelingIdInternal(newModelingRowName.ToString());
 }
 
 bool UCharacterAppearanceComponent::SetModelingRowHandle(const FDataTableRowHandle& newModelingRowHandle)
@@ -171,6 +202,7 @@ void UCharacterAppearanceComponent::OnRep_ActiveModelingId()
 
 bool UCharacterAppearanceComponent::ApplyModelingIdInternal(const FString& modelingId)
 {
+	if (!modelingId.IsEmpty() && appliedModelingId == modelingId && appliedModelingTable.Get() == modelingDataTable) return true;
 	FCharacterModelingRow modelingRow;
 	if (!FindModelingRow(modelingId, modelingRow))
 	{
@@ -179,6 +211,8 @@ bool UCharacterAppearanceComponent::ApplyModelingIdInternal(const FString& model
 
 	ApplyLiveMesh(modelingRow);
 	ApplyDeathMesh(modelingRow);
+	appliedModelingId = modelingId;
+	appliedModelingTable = modelingDataTable;
 	return true;
 }
 
@@ -331,6 +365,10 @@ void UCharacterAppearanceComponent::ApplyLiveMesh(const FCharacterModelingRow& m
 	if (USkeletalMesh* mesh = modelingRow.characterMesh.LoadSynchronous())
 	{
 		meshComponent->SetSkeletalMesh(mesh);
+
+		// SetSkeletalMesh는 컴포넌트의 Override Material을 유지합니다.
+		// 이전 캐릭터용 머티리얼이 슬롯 번호 기준으로 새 메시에 덮어씌워지는 것을 막기 위해 비웁니다.
+		meshComponent->EmptyOverrideMaterials();
 	}
 
 	if (!modelingRow.animationInstanceClass.IsNull())

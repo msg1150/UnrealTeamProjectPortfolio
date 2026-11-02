@@ -1,0 +1,139 @@
+# PJH integration excerpts
+# Personal changes to shared files; zero-context review diff, not an automatic migration.
+
+# Merge pull request #839 from Qusbell/PJH_20261027_CharacterPool
+# 68e2c9fbc9eecb9e1d01aba94b03df68a5957356
+diff --git a/Source/ShootingArena/Private/AI/QuakeTargetSelectionAIController.cpp b/Source/ShootingArena/Private/AI/QuakeTargetSelectionAIController.cpp
+index ce7c03b34..8d2d7e923 100644
+--- a/Source/ShootingArena/Private/AI/QuakeTargetSelectionAIController.cpp
++++ b/Source/ShootingArena/Private/AI/QuakeTargetSelectionAIController.cpp
+@@ -3,0 +4 @@
++#include "Character/CharacterPoolComponent.h"
+@@ -46,0 +48,3 @@ void AQuakeTargetSelectionAIController::OnUnPossess()
++	if (APawn* PreviousPawn = GetPawn())
++		if (const auto* Pool = PreviousPawn->FindComponentByClass<UCharacterPoolComponent>(); Pool && Pool->IsManaged())
++			UCharacterPoolComponent::ResetAIForLife(this, PreviousPawn);
+@@ -161 +165 @@ bool AQuakeTargetSelectionAIController::IsCharacterDead(const ACharacter* Charac
+-	if (!IsValid(Character))
++	if (!IsValid(Character) || UCharacterPoolComponent::IsInactive(Character))
+diff --git a/Source/ShootingArena/Private/Combat/RecentAttackerComponent.cpp b/Source/ShootingArena/Private/Combat/RecentAttackerComponent.cpp
+index 6aa07caac..ea6d37981 100644
+--- a/Source/ShootingArena/Private/Combat/RecentAttackerComponent.cpp
++++ b/Source/ShootingArena/Private/Combat/RecentAttackerComponent.cpp
+@@ -16,0 +17,8 @@ URecentAttackerComponent::URecentAttackerComponent()
++void URecentAttackerComponent::ResetForNextLife()
++{
++	LastAttackerPlayerState.Reset();
++	LastAttackerTime = 0.f;
++	bHasLastAttackerTime = false;
++	bDeathCreditResolved = false;
++}
++
+diff --git a/Source/ShootingArena/Private/MyPlayerController.cpp b/Source/ShootingArena/Private/MyPlayerController.cpp
+index 9c6672a60..3940a47cd 100644
+--- a/Source/ShootingArena/Private/MyPlayerController.cpp
++++ b/Source/ShootingArena/Private/MyPlayerController.cpp
+@@ -2,0 +3 @@
++#include "Character/CharacterPoolComponent.h"
+@@ -214,0 +216,8 @@ void AMyPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
++void AMyPlayerController::OnUnPossess()
++{
++	if (APawn* PreviousPawn = GetPawn())
++		if (const auto* Pool = PreviousPawn->FindComponentByClass<UCharacterPoolComponent>(); Pool && Pool->IsManaged())
++			UCharacterPoolComponent::DetachControllerLife(this, PreviousPawn);
++	Super::OnUnPossess();
++}
++
+diff --git a/Source/ShootingArena/Public/Combat/RecentAttackerComponent.h b/Source/ShootingArena/Public/Combat/RecentAttackerComponent.h
+index a5c256c08..268511a58 100644
+--- a/Source/ShootingArena/Public/Combat/RecentAttackerComponent.h
++++ b/Source/ShootingArena/Public/Combat/RecentAttackerComponent.h
+@@ -67 +67 @@ public:
+-	/** Resolve this owner's death. The result event is broadcast once per component lifetime. */
++	/** Resolve once per life; dedicated pawns explicitly reset the credit latch at respawn. */
+@@ -69,0 +70 @@ public:
++	void ResetForNextLife();
+diff --git a/Source/ShootingArena/Public/MyPlayerController.h b/Source/ShootingArena/Public/MyPlayerController.h
+index e49227fcf..7c98167d4 100644
+--- a/Source/ShootingArena/Public/MyPlayerController.h
++++ b/Source/ShootingArena/Public/MyPlayerController.h
+@@ -88,0 +89 @@ protected:
++	virtual void OnUnPossess() override;
+
+# Merge pull request #856 from Qusbell/PJH_20261029
+# aedd81fb870bbb17ac5e6791a24906fbf06cd6db
+diff --git a/Source/ShootingArena/Private/MyPlayerState.cpp b/Source/ShootingArena/Private/MyPlayerState.cpp
+index ac6cd9250..0b7fbd462 100644
+--- a/Source/ShootingArena/Private/MyPlayerState.cpp
++++ b/Source/ShootingArena/Private/MyPlayerState.cpp
+@@ -2 +1,0 @@
+-#include "Audio/BGMSubsystem.h"
+@@ -63,4 +61,0 @@ void AMyPlayerState::Server_RequestReturnToLobbyVotesRefresh_Implementation()
+-	// WBP_Result가 Construct될 때 이미 이 RPC를 호출합니다. 이 기존 신호를 이용해
+-	// 별도의 Blueprint 노드 추가 없이 모든 로컬 클라이언트의 Result BGM을 시작합니다.
+-	Multicast_PlayResultBGM();
+-
+@@ -76,18 +70,0 @@ void AMyPlayerState::Server_RequestReturnToLobbyVotesRefresh_Implementation()
+-void AMyPlayerState::Multicast_PlayResultBGM_Implementation()
+-{
+-	if (IsRunningDedicatedServer())
+-	{
+-		return;
+-	}
+-
+-	UGameInstance* GameInstance = GetWorld() ? GetWorld()->GetGameInstance() : nullptr;
+-	if (GameInstance)
+-	{
+-		if (UBGMSubsystem* BGM = GameInstance->GetSubsystem<UBGMSubsystem>())
+-		{
+-			BGM->PlayResultBGM();
+-			UE_LOG(LogTemp, Log, TEXT("[BGM] Result widget shown; Result BGM requested."));
+-		}
+-	}
+-}
+-
+diff --git a/Source/ShootingArena/Public/MyPlayerState.h b/Source/ShootingArena/Public/MyPlayerState.h
+index 837a48d33..3d8e22e84 100644
+--- a/Source/ShootingArena/Public/MyPlayerState.h
++++ b/Source/ShootingArena/Public/MyPlayerState.h
+@@ -49,4 +48,0 @@ public:
+-	/** 결과 위젯이 표시된 사실을 모든 클라이언트에 알려 Result BGM으로 전환합니다. */
+-	UFUNCTION(NetMulticast, Reliable)
+-	void Multicast_PlayResultBGM();
+-
+
+# Merge pull request #860 from Qusbell/PJH_20261029_GameplayValid
+# 95085caf2bdcced4ddc707daafa1e412d45224fe
+diff --git a/Config/DefaultEditorPerProjectUserSettings.ini b/Config/DefaultEditorPerProjectUserSettings.ini
+index 79aada27d..4d4eeec34 100644
+--- a/Config/DefaultEditorPerProjectUserSettings.ini
++++ b/Config/DefaultEditorPerProjectUserSettings.ini
+@@ -5 +5 @@ ContentBrowserTab1.SelectedPaths=/Game/FirstPersonBP
+-+TargetBindings=(ProviderId="Portal",SlotId="OneWay",TargetClass="/Game/QuakeLike_1_0/Portal/BP_OneWayPortal.BP_OneWayPortal_C")
+++TargetBindings=(ProviderId="Portal",SlotId="Seamless",TargetClass="/Script/ShootingArena.SeamlessPortalActor")
+@@ -7,0 +8 @@ ContentBrowserTab1.SelectedPaths=/Game/FirstPersonBP
+++TargetBindings=(ProviderId="JumpPad",SlotId="Direction",TargetClass="/Game/QuakeLike_1_0/MapDesign/MapGimmick/BPA_YJS_Direction_JumpPad.BPA_YJS_Direction_JumpPad_C")
+
+# Merge pull request #864 from Qusbell/PJH_20261030_Json
+# 0b5e0ec19e3e6b2d55fb89ab90a21c07429b50d0
+diff --git a/Config/DefaultGame.ini b/Config/DefaultGame.ini
+index 3e91f1151..eb3add257 100644
+--- a/Config/DefaultGame.ini
++++ b/Config/DefaultGame.ini
+@@ -113,0 +114,3 @@ bSkipMovies=False
++; Keep JSON-driven weapons and their Blueprint data classes in both client/server cooks.
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/Item")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/PDA")
+@@ -122,0 +126,12 @@ bSkipMovies=False
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/GameFlow/Table/DT")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/GameFlow/Table/ST")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/AI")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/AI/LSH_AI_Table/02_AI_Struct")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/Item/DeathDrop")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/Item/DropTable")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Spawner/DataTable")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/GameMode")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/Respawn")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/Chracter")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/BGM")
+++DirectoriesToAlwaysCook=(Path="/Game/QuakeLike_1_0/Data/AI/Aggression")
